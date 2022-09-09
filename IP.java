@@ -88,27 +88,8 @@ public class IP {
         return updateImageAndSize(_bh, _bw, (bi, bw, bh, x, y) -> {
             int y1 = bw - x - 1;
             int x1 = bh - y - 1;
-            // System.out.println(x1);
-            // System.out.println(y1);
             return new Color(bi.getRGB(x1, y1));
         });
-
-        // BufferedImage intermediate = new BufferedImage(bufferedImage.getHeight(), bufferedImage.getWidth(),
-        //         BufferedImage.TYPE_INT_ARGB);
-        // for (int y = 0; y < bufferedImage.getHeight(); y++) {
-        //     for (int x = 0; x < bufferedImage.getWidth(); x++) {
-
-        //         Color color = new Color(bufferedImage.getRGB(x, y));
-
-        //         int y1 = bufferedImage.getWidth() - x - 1;
-        //         int x1 = bufferedImage.getHeight() - y - 1;
-
-        //         intermediate.setRGB(x1, y1, color.getRGB());
-        //     }
-        // }
-
-        // bufferedImage = intermediate;
-        // return this;
     }
 
     public IP translateForward(int dx, int dy) {
@@ -140,32 +121,15 @@ public class IP {
     }
 
     public IP translate(int dx, int dy) {
-        int bw = bufferedImage.getWidth();
-        int bh = bufferedImage.getHeight();
-        BufferedImage intermediate = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB);
 
-        Graphics g = intermediate.getGraphics();
-        g.setColor(Color.CYAN);
-        g.fillRect(0, 0, bw, bh);
-
-        for (int y = 0; y < bh; y++) {
-            for (int x = 0; x < bw; x++) {
-                int originalX = x - dx;
-                int originalY = y - dy;
-
-                Color color;
-                if (originalX >= bw || originalY >= bh || originalX < 0 || originalY < 0)
-                    color = Color.MAGENTA;
-
-                else
-                    color = new Color(bufferedImage.getRGB(originalX, originalY));
-
-                intermediate.setRGB(x, y, color.getRGB());
+        return updateImage((bi, bw, bh, x, y) -> {
+            int x1 = x - dx;
+            int y1 = y - dy;
+            if(MyMath.inBounds(bw,bh, x1, y1)){
+                return new Color(bi.getRGB(x1, y1));
             }
-        }
-
-        bufferedImage = intermediate;
-        return this;
+            return Color.MAGENTA;
+        });
     }
 
     public IP scaleLinear(float scale) {

@@ -19,4 +19,8 @@ public class MyMath {
   public static float getY(float distance, float angle) {
     return (float) Math.sin(angle) * distance;
   }
+
+  public static boolean inBounds(int w, int h, int x, int y){
+    return( x >= 0 && y >= 0 && x < w && y < h);
+  }
 }
