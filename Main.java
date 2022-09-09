@@ -6,8 +6,8 @@ public class Main {
       return;
     }
 
-    // new IP("download.jpg")
-    //     .translateForward(100, 100)
-    //     .save("done.png");
+    new IP("download.jpg")
+        .rotate90()
+        .save("done.png");
   }
 }

@@ -61,7 +61,7 @@ public class IP {
         BufferedImage intermediate = new BufferedImage(nw, nh, BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < nh; y++) {
             for (int x = 0; x < nw; x++) {
-                Color color = lambda.toColor(bufferedImage, bw, bh, x, y);
+                Color color = lambda.toColor(bufferedImage, nw, nh, x, y);
 
                 intermediate.setRGB(x, y, color.getRGB());
             }
@@ -82,33 +82,33 @@ public class IP {
 
     public IP rotate90() {
 
-        // int _bw = bufferedImage.getWidth();
-        // int _bh = bufferedImage.getHeight();
+        int _bw = bufferedImage.getWidth();
+        int _bh = bufferedImage.getHeight();
 
-        // return updateImageAndSize(_bh, _bw, (bi, bw, bh, x, y) -> {
-        //     int y1 = bw - x - 1;
-        //     int x1 = bh - y - 1;
-        //     System.out.println(x1);
-        //     System.out.println(y1);
-        //     return new Color(bi.getRGB(x1, y1));
-        // });
+        return updateImageAndSize(_bh, _bw, (bi, bw, bh, x, y) -> {
+            int y1 = bw - x - 1;
+            int x1 = bh - y - 1;
+            // System.out.println(x1);
+            // System.out.println(y1);
+            return new Color(bi.getRGB(x1, y1));
+        });
 
-        BufferedImage intermediate = new BufferedImage(bufferedImage.getHeight(), bufferedImage.getWidth(),
-                BufferedImage.TYPE_INT_ARGB);
-        for (int y = 0; y < bufferedImage.getHeight(); y++) {
-            for (int x = 0; x < bufferedImage.getWidth(); x++) {
+        // BufferedImage intermediate = new BufferedImage(bufferedImage.getHeight(), bufferedImage.getWidth(),
+        //         BufferedImage.TYPE_INT_ARGB);
+        // for (int y = 0; y < bufferedImage.getHeight(); y++) {
+        //     for (int x = 0; x < bufferedImage.getWidth(); x++) {
 
-                Color color = new Color(bufferedImage.getRGB(x, y));
+        //         Color color = new Color(bufferedImage.getRGB(x, y));
 
-                int y1 = bufferedImage.getWidth() - x - 1;
-                int x1 = bufferedImage.getHeight() - y - 1;
+        //         int y1 = bufferedImage.getWidth() - x - 1;
+        //         int x1 = bufferedImage.getHeight() - y - 1;
 
-                intermediate.setRGB(x1, y1, color.getRGB());
-            }
-        }
+        //         intermediate.setRGB(x1, y1, color.getRGB());
+        //     }
+        // }
 
-        bufferedImage = intermediate;
-        return this;
+        // bufferedImage = intermediate;
+        // return this;
     }
 
     public IP translateForward(int dx, int dy) {
