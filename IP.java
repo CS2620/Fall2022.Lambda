@@ -30,13 +30,6 @@ public class IP {
         return this;
     }
 
-    public IP toGrayscale() {
-        return updatePixels(c -> {
-            int gray = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
-            return new Color(gray, gray, gray);
-        });
-    }
-
     public IP updateImage(IUpdateLambda lambda) {
         int bw = bufferedImage.getWidth();
         int bh = bufferedImage.getHeight();
@@ -69,6 +62,13 @@ public class IP {
 
         bufferedImage = intermediate;
         return this;
+    }
+
+    public IP toGrayscale() {
+        return updatePixels(c -> {
+            int gray = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
+            return new Color(gray, gray, gray);
+        });
     }
 
     public IP rotate180() {
@@ -125,7 +125,7 @@ public class IP {
         return updateImage((bi, bw, bh, x, y) -> {
             int x1 = x - dx;
             int y1 = y - dy;
-            if(MyMath.inBounds(bw,bh, x1, y1)){
+            if (MyMath.inBounds(bw, bh, x1, y1)) {
                 return new Color(bi.getRGB(x1, y1));
             }
             return Color.MAGENTA;
@@ -133,31 +133,24 @@ public class IP {
     }
 
     public IP scaleLinear(float scale) {
-        var bw = bufferedImage.getWidth();
-        var bh = bufferedImage.getHeight();
-        var nw = (int) (bw * scale + .5);
-        var nh = (int) (bh * scale + .5);
-        var intermediate = new BufferedImage(nw, nh, BufferedImage.TYPE_INT_ARGB);
 
-        for (var y = 0; y < nh; y++) {
-            for (var x = 0; x < nw; x++) {
+        var _bw = bufferedImage.getWidth();
+        var _bh = bufferedImage.getHeight();
+        var nw = (int) (_bw * scale + .5);
+        var nh = (int) (_bh * scale + .5);
+        return updateImageAndSize(nw, nh, (bi, bw, bh, x, y) -> {
 
-                float originalX = (x / scale);
-                float originalY = (y / scale);
+            float originalX = (x / scale);
+            float originalY = (y / scale);
 
-                Color color;
-                if (!MyMath.inBounds(bw, bh, (int)originalX, (int)originalY))
-                    color = Color.MAGENTA;
-                else {
-                    color = getBilinear(bufferedImage, originalX, originalY, Color.WHITE);
-                }
-                intermediate.setRGB(x, y, color.getRGB());
+            Color color;
+            if (!MyMath.inBounds(bw, bh, (int) originalX, (int) originalY))
+                color = Color.MAGENTA;
+            else {
+                color = getBilinear(bufferedImage, originalX, originalY, Color.WHITE);
             }
-        }
-
-        bufferedImage = intermediate;
-
-        return this;
+            return color;
+        });
     }
 
     public IP scaleNN(float scale) {
@@ -216,38 +209,11 @@ public class IP {
                 if (newX >= bw || newY >= bh || newX < 0 || newY < 0)
                     color = Color.MAGENTA;
                 else {
-
-                    var color00 = new Color(bufferedImage.getRGB((int) newX, (int) newY));
-                    Color color10;
-                    Color color01;
-                    Color color11;
-
-                    if (newX + 1 < bw)
-                        color10 = new Color(bufferedImage.getRGB((int) newX + 1, (int) newY));
-                    else
-                        color10 = Color.WHITE;
-                    if (newY + 1 < bh) {
-                        color01 = new Color(bufferedImage.getRGB((int) newX, (int) newY + 1));
-                    } else
-                        color01 = Color.WHITE;
-
-                    if (newX + 1 < bw && newY + 1 < bh)
-                        color11 = new Color(bufferedImage.getRGB((int) newX + 1, (int) newY + 1));
-                    else {
-                        color11 = Color.WHITE;
-                    }
-
-                    float percentX = newX - (int) newX;
-                    float percentY = newY - (int) newY;
-
-                    var interpolationX1 = interpolate(color00, color10, percentX);
-                    var interpolationX2 = interpolate(color01, color11, percentX);
-
-                    var interpolationY = interpolate(interpolationX1, interpolationX2, percentY);
+                    var interpolationY = getBilinear(bufferedImage, newX, newY, Color.WHITE);
                     if (linearInterpolation)
                         color = interpolationY;
                     else
-                        color = color00;
+                        color = getNN(bufferedImage, (int) newX, (int) newY, Color.WHITE);
                 }
                 intermediate.setRGB(x, y, color.getRGB());
             }
@@ -263,7 +229,7 @@ public class IP {
             ImageIO.write(bufferedImage, "PNG", new File(filename));
         } catch (IOException e) {
             e.printStackTrace();
-        } 
+        }
         return this;
 
     }
@@ -297,13 +263,13 @@ public class IP {
         return result;
     }
 
-    private Color getBilinear(BufferedImage inImage, float x, float y, Color border){
+    private Color getBilinear(BufferedImage inImage, float x, float y, Color border) {
         var color00 = new Color(bufferedImage.getRGB((int) x, (int) y));
         Color color10;
         Color color01;
         Color color11;
 
-        if ((int)x + 1 < inImage.getWidth())
+        if ((int) x + 1 < inImage.getWidth())
             color10 = new Color(bufferedImage.getRGB((int) x + 1, (int) y));
         else
             color10 = Color.WHITE;
@@ -313,7 +279,7 @@ public class IP {
             color01 = Color.WHITE;
 
         if (x + 1 < inImage.getWidth() && y + 1 < inImage.getHeight())
-            color11 = new Color(bufferedImage.getRGB((int) x + 1, (int) y+ 1));
+            color11 = new Color(bufferedImage.getRGB((int) x + 1, (int) y + 1));
         else {
             color11 = Color.WHITE;
         }
@@ -328,8 +294,8 @@ public class IP {
         return interpolationY;
     }
 
-    private Color getNN(BufferedImage inImage, int x, int y, Color border){
-        if(MyMath.inBounds(inImage.getWidth(), inImage.getHeight(), x, y)){
+    private Color getNN(BufferedImage inImage, int x, int y, Color border) {
+        if (MyMath.inBounds(inImage.getWidth(), inImage.getHeight(), x, y)) {
             return new Color(inImage.getRGB(x, y));
         }
         return border;
