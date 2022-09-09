@@ -7,7 +7,7 @@ public class Main {
     }
 
     new IP("download.jpg")
-        .translate(100, 100)
+        .scaleNN(2)
         .save("done.png");
   }
 }

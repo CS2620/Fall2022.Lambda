@@ -23,4 +23,7 @@ public class MyMath {
   public static boolean inBounds(int w, int h, int x, int y){
     return( x >= 0 && y >= 0 && x < w && y < h);
   }
+  public static boolean inBounds(int w, int h, float x, float y){
+    return inBounds(w,h,(int)x,(int)y);
+  }
 }
