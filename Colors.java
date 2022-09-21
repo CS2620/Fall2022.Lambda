@@ -4,7 +4,7 @@
 public class Colors {
 
   static{
-    boolean doQuickTests = true;
+    boolean doQuickTests = false;
     if (doQuickTests) {
       test(255, 0, 0);
       test(0, 255, 0);
