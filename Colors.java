@@ -3,7 +3,9 @@
 
 public class Colors {
 
-  static{
+  
+
+  public static void runTests(){
     boolean doQuickTests = false;
     if (doQuickTests) {
       test(255, 0, 0);
@@ -16,7 +18,7 @@ public class Colors {
       test(128, 128, 255);
     }
 
-    boolean doLongTests = false;
+    boolean doLongTests = true;
     if (doLongTests) {
       System.out.println("Testing color conversion functions.");
       long start = System.currentTimeMillis();
@@ -81,8 +83,8 @@ public class Colors {
 
     saturation /= 255.0f;
     value /= 255.0f;
-    int h = (int) (hue / 360.0f * 6);
-    float f = hue / 360.0f * 6 - h;
+    int h = (int) (hue / 60.0f);
+    float f = hue / 60.0f - h;
     float p = value * (1 - saturation);
     float q = value * (1 - f * saturation);
     float t = value * (1 - (1 - f) * saturation);
@@ -154,11 +156,19 @@ public class Colors {
 
   public static float[] hsvToRgb2(float hue, float saturation, float value) {
 
+    hue /= 360.0f;
+    saturation/=255.0f;
+    value /= 255.0f;
     int h = (int) (hue * 6);
     float f = hue * 6 - h;
     float p = value * (1 - saturation);
     float q = value * (1 - f * saturation);
     float t = value * (1 - (1 - f) * saturation);
+
+    value *= 255;
+    t *= 255;
+    p *= 255;
+    q *= 255;
 
     switch (h) {
       case 0:
@@ -183,10 +193,14 @@ public class Colors {
     float[] hsv = rgb_to_hsv(i, j, k);
     float[] hsv2 = rgb_to_hsv2(i, j, k);
 
-    float[] rgb = hsvToRgb2(hsv[0], hsv[1], hsv[2]);
+    float[] rgb = hsvToRgb(hsv[0], hsv[1], hsv[2]);
+    float[] rgb2 = hsvToRgb2(hsv[0], hsv[1], hsv[2]);
 
-    if (close(hsv[0], hsv2[0]) && close(hsv[1], hsv[1]) && close(hsv[2], hsv[2]) && close(i, rgb[0]) && close(j, rgb[1])
-        && close(k, rgb[2]))
+    if (
+      close(hsv[0], hsv2[0]) && close(hsv[1], hsv[1]) && close(hsv[2], hsv[2])
+     && close(i, rgb[0]) && close(j, rgb[1]) && close(k, rgb[2])
+     && close(i, rgb2[0]) && close(j, rgb2[1]) && close(k, rgb2[2])
+     )
       return;
     System.out.println();
     print(new float[] { i, j, k });
