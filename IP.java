@@ -5,7 +5,7 @@ import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
-public class IP extends IPBase{
+public class IP extends IPBase {
     public IP(String filename) {
         super();
         try {
@@ -15,7 +15,7 @@ public class IP extends IPBase{
         }
     }
 
-    public IP(IPBase base){
+    public IP(IPBase base) {
         super();
         this.bufferedImage = base.bufferedImage;
     }
@@ -23,6 +23,13 @@ public class IP extends IPBase{
     public IP toGrayscale() {
         return updatePixels(c -> {
             int gray = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
+            return new Color(gray, gray, gray);
+        });
+    }
+
+    public IP toGrayscaleHSV() {
+        return updatePixels(c -> {
+            int gray = Math.max(c.getRed(), Math.max(c.getGreen(), c.getBlue()));
             return new Color(gray, gray, gray);
         });
     }
@@ -166,6 +173,153 @@ public class IP extends IPBase{
             }
         }
 
+        bufferedImage = intermediate;
+
+        return this;
+    }
+
+    public IP changeHue(int degrees) {
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+        var intermediate = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB);
+
+        for (var y = 0; y < bh; y++) {
+            for (var x = 0; x < bw; x++) {
+
+                Color original = new Color(bufferedImage.getRGB(x, y));
+
+                float[] hsv = Colors.rgb_to_hsv(original.getRed(), original.getGreen(), original.getBlue());
+
+                hsv[0] += degrees;
+                while (hsv[0] < 0) {
+                    hsv[0] += 360;
+                }
+                hsv[0] %= 360;
+
+                float[] rgb = Colors.hsvToRgb(hsv[0], hsv[1], hsv[2]);
+
+                intermediate.setRGB(x, y, new Color((int) rgb[0], (int) rgb[1], (int) rgb[2]).getRGB());
+            }
+        }
+
+        bufferedImage = intermediate;
+
+        return this;
+    }
+
+    public IP changeSaturation(int amount) {
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+        var intermediate = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB);
+
+        for (var y = 0; y < bh; y++) {
+            for (var x = 0; x < bw; x++) {
+
+                Color original = new Color(bufferedImage.getRGB(x, y));
+
+                float[] hsv = Colors.rgb_to_hsv(original.getRed(), original.getGreen(), original.getBlue());
+
+                hsv[1] += amount;
+                if (hsv[1] < 0) {
+                    hsv[1] = 0;
+                }
+                if (hsv[1] > 255) {
+                    hsv[1] = 255;
+                }
+
+                float[] rgb = Colors.hsvToRgb(hsv[0], hsv[1], hsv[2]);
+
+                intermediate.setRGB(x, y, new Color((int) rgb[0], (int) rgb[1], (int) rgb[2]).getRGB());
+            }
+        }
+
+        bufferedImage = intermediate;
+
+        return this;
+    }
+
+    public IP changeValue(int amount) {
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+        var intermediate = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB);
+
+        for (var y = 0; y < bh; y++) {
+            for (var x = 0; x < bw; x++) {
+
+                Color original = new Color(bufferedImage.getRGB(x, y));
+
+                float[] hsv = Colors.rgb_to_hsv(original.getRed(), original.getGreen(), original.getBlue());
+
+                hsv[2] += amount;
+                if (hsv[2] < 0) {
+                    hsv[2] = 0;
+                }
+                if (hsv[2] > 255) {
+                    hsv[2] = 255;
+                }
+
+                float[] rgb = Colors.hsvToRgb(hsv[0], hsv[1], hsv[2]);
+
+                intermediate.setRGB(x, y, new Color((int) rgb[0], (int) rgb[1], (int) rgb[2]).getRGB());
+            }
+        }
+
+        bufferedImage = intermediate;
+
+        return this;
+    }
+
+    public IP toHistogram() {
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+
+        int height = 100;
+        var intermediate = new BufferedImage(255, height, BufferedImage.TYPE_INT_ARGB);
+
+        float[] histogram = new float[256];
+        for (var i = 0; i < 256; i++) {
+            histogram[0] = 0;
+        }
+
+        for (var y = 0; y < bh; y++) {
+            for (var x = 0; x < bw; x++) {
+
+                Color original = new Color(bufferedImage.getRGB(x, y));
+
+                float[] hsv = Colors.rgb_to_hsv(original.getRed(), original.getGreen(), original.getBlue());
+
+                histogram[(int) hsv[2]]++;
+
+            }
+        }
+
+        // Normalize
+        float max = 0;
+        for (int i = 0; i < 256; i++) {
+            if (histogram[i] > max) {
+                max = histogram[i];
+            }
+        }
+
+        for (int i = 0; i < 256; i++) {
+            histogram[i] /= max;
+
+        }
+
+        Graphics g = intermediate.getGraphics();
+
+        g.setColor(Color.BLACK);
+        g.fillRect(0, 0, 255, height);
+
+        for (int i = 0; i < 256; i++) {
+            g.setColor(Color.WHITE);
+            g.fillRect(i, 0, 1, (int)(histogram[i]*height));
+        }
+
+        g.dispose();
+
+        // intermediate.setRGB(x, y, new Color((int) rgb[0], (int) rgb[1], (int)
+        // rgb[2]).getRGB());
         bufferedImage = intermediate;
 
         return this;
