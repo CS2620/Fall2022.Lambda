@@ -6,11 +6,14 @@ public class Main {
       return;
     }
 
-    new IP("download.jpg")
-        .toHistogram()
-        .save("histrogram.png");
+    // new IP("download.jpg")
+    //     .toHistogram()
+    //     .save("histrogram.png");
 
-    Colors.runTests();
+    new ICon("download.jpg", -50,  -50).save("done.png");
+
+    if(false)//True to run the color space conversion tests
+        Colors.runTests();
 
   }
 

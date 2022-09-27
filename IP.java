@@ -15,6 +15,12 @@ public class IP extends IPBase {
         }
     }
 
+    public IP(BufferedImage bi){
+        super();
+        this.bufferedImage = bi;
+
+    }
+
     public IP(IPBase base) {
         super();
         this.bufferedImage = base.bufferedImage;
