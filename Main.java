@@ -31,11 +31,11 @@ public class Main {
 
     if (true)// True to generate histogram images
     {
-      for (String filename : new String[] { "_test1", "_test2", "_test3", "_test4", "_test5" }) {
+    for (String filename : new String[] { "_test1"/*, "_test2", "_test3", "_test4", "_test5"*/ }) {
         new ICon("./images/" + filename + ".jpg")
             .setAsWidth(width)
             .setAsHeight(height)
-            .addToCanvasSize(0, 100)
+            .addToCanvasSize(0, 100*4)
             .generateLayer(l -> l.exec(i -> i.toHistogram()))
             .moveLayer(0, height.get())
             .exec(ip -> ip.scaleLinear(width.get() / 255.0f, 1))

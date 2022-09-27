@@ -6,6 +6,7 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public class IP extends IPBase {
+
     public IP(String filename) {
         super();
         try {
@@ -15,7 +16,7 @@ public class IP extends IPBase {
         }
     }
 
-    public IP(BufferedImage bi){
+    public IP(BufferedImage bi) {
         super();
         this.bufferedImage = bi;
 
@@ -284,6 +285,24 @@ public class IP extends IPBase {
         return this;
     }
 
+    public IP toRed() {
+        return updatePixels(c -> {
+            return new Color(c.getRed(), c.getRed(), c.getRed());
+        });
+    }
+
+    public IP toGreen() {
+        return updatePixels(c -> {
+            return new Color(c.getGreen(), c.getGreen(), c.getGreen());
+        });
+    }
+
+    public IP toBlue() {
+        return updatePixels(c -> {
+            return new Color(c.getBlue(), c.getBlue(), c.getBlue());
+        });
+    }
+
     public IP toHistogram() {
         var bw = bufferedImage.getWidth();
         var bh = bufferedImage.getHeight();
@@ -328,7 +347,7 @@ public class IP extends IPBase {
 
         for (int i = 0; i < 256; i++) {
             g.setColor(Color.BLACK);
-            g.fillRect(i, 0, 1, (int)((1-histogram[i])*height));
+            g.fillRect(i, 0, 1, (int) ((1 - histogram[i]) * height));
         }
 
         g.dispose();
