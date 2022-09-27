@@ -16,6 +16,7 @@ public class ICon {
   int width;
   int height;
   Color backgroundColor = Color.BLACK;
+  int currentLayer = 0;
 
   public ICon(String filename){
     this(new IP(filename));
@@ -38,6 +39,16 @@ public class ICon {
   public ICon save(String filename){
     var ip = this.flatten();
     ip.save(filename);
+    return this;
+  }
+
+  public ICon addLayer(String filename){
+    return addLayer(new Layer(filename));
+  }
+
+  public ICon addLayer(Layer layer){
+    layers.add(layer);
+    currentLayer = layers.size()-1;
     return this;
   }
 
