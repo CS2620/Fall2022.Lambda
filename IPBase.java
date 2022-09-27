@@ -1,11 +1,26 @@
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
 
 public abstract class IPBase {
   BufferedImage bufferedImage;
+
+  public IP clone(){
+    BufferedImage bi = deepCopy(bufferedImage);
+    return new IP(bi);
+  }
+
+  // From https://stackoverflow.com/a/26894825/10047920
+  public BufferedImage deepCopy(BufferedImage bi) {
+    ColorModel cm = bi.getColorModel();
+    boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+    WritableRaster raster = bi.copyData(bi.getRaster().createCompatibleWritableRaster());
+    return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+  }
 
   public IP updatePixels(IColorToColor lambda) {
     for (int y = 0; y < bufferedImage.getHeight(); y++) {

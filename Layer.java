@@ -29,11 +29,24 @@ public class Layer {
     this(ip, offsetX, offsetY, 1, Color.BLACK);
   }
 
+  public Layer(Layer layer){
+    this(layer.ip.clone(), layer.offsetX, layer.offsetY, layer.alpha, layer.backgroundColor);
+  }
+
   public Layer(IP ip, int offsetX, int offsetY, float alpha, Color backgroundColor){
     this.ip = ip;
     this.offsetX = offsetX;
     this.offsetY = offsetY;
     this.alpha = alpha;
     this.backgroundColor = backgroundColor;
+  }
+
+  public Layer clone(){
+    return new Layer(this);
+  }
+
+  public Layer exec(IIPLambda lambda){
+    lambda.lambda(ip);
+    return this;
   }
 }

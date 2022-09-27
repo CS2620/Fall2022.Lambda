@@ -314,12 +314,12 @@ public class IP extends IPBase {
 
         Graphics g = intermediate.getGraphics();
 
-        g.setColor(Color.BLACK);
+        g.setColor(Color.WHITE);
         g.fillRect(0, 0, 255, height);
 
         for (int i = 0; i < 256; i++) {
-            g.setColor(Color.WHITE);
-            g.fillRect(i, 0, 1, (int)(histogram[i]*height));
+            g.setColor(Color.BLACK);
+            g.fillRect(i, 0, 1, (int)((1-histogram[i])*height));
         }
 
         g.dispose();

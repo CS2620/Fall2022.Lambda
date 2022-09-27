@@ -18,81 +18,87 @@ public class ICon {
   Color backgroundColor = Color.BLACK;
   int currentLayer = 0;
 
-  public ICon(String filename){
+  public ICon(String filename) {
     this(new IP(filename));
   }
 
-  public ICon(String filename, int offsetX, int offsetY){
+  public ICon(String filename, int offsetX, int offsetY) {
     this(new Layer(filename, offsetX, offsetY));
   }
 
-  public ICon(IP ip){
+  public ICon(IP ip) {
     this(new Layer(ip));
   }
 
-  public ICon(Layer layer){
+  public ICon(Layer layer) {
     layers.add(layer);
     width = layer.ip.bufferedImage.getWidth();
     height = layer.ip.bufferedImage.getHeight();
   }
 
-  public ICon save(String filename){
+  public ICon save(String filename) {
     var ip = this.flatten();
     ip.save(filename);
     return this;
   }
 
-  public ICon addLayer(String filename){
+  public ICon addLayer(String filename) {
     return addLayer(new Layer(filename));
   }
 
-  public ICon addLayer(Layer layer){
+  public ICon addLayer(Layer layer) {
     layers.add(layer);
-    currentLayer = layers.size()-1;
+    currentLayer = layers.size() - 1;
     return this;
   }
 
-  public IP flatten(){
+  public IP flatten() {
     BufferedImage bi = new BufferedImage(width, height, BufferedImage.TYPE_3BYTE_BGR);
-    
-    //Fill in the background
+
+    // Fill in the background
     Graphics g = bi.getGraphics();
     g.setColor(this.backgroundColor);
     g.fillRect(0, 0, width, height);
     g.dispose();
 
-    for(int i = 0; i < layers.size(); i++){
-      for(int y = 0; y < height; y++){
-        for(int x = 0; x < width; x++){
+    for (int i = 0; i < layers.size(); i++) {
+      for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
           var layer = layers.get(i);
           int ix = x - layer.offsetX;
           int iy = y - layer.offsetY;
           var ip = layer.ip;
-          if(!ip.isValidCoordinate(ix, iy)) continue;
-          int rgb = ip.bufferedImage.getRGB(ix,iy);
-          bi.setRGB(x,y,rgb);
+          if (!ip.isValidCoordinate(ix, iy))
+            continue;
+          int rgb = ip.bufferedImage.getRGB(ix, iy);
+          bi.setRGB(x, y, rgb);
         }
       }
     }
 
     return new IP(bi);
-    
+
   }
 
-  public Layer getCurrentLayer(){
+  public Layer getCurrentLayer() {
     return layers.get(currentLayer);
   }
 
-  public ICon selectLayer(int index){
-    if(index < 0 || index >= layers.size())
+  public ICon selectLayer(int index) {
+    if (index < 0 || index >= layers.size())
       throw new IndexOutOfBoundsException();
     this.currentLayer = index;
     return this;
   }
 
-  public ICon exec(IIPLambda lambda){
+  public ICon exec(IIPLambda lambda) {
     lambda.lambda(getCurrentLayer().ip);
     return this;
   }
-  
+
+  public ICon generateLayer(ILayerLambda lambda) {
+    addLayer(lambda.lambda(getCurrentLayer().clone()));
+    return this;
+  }
+
 }
