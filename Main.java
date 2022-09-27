@@ -10,7 +10,7 @@ public class Main {
     //     .toHistogram()
     //     .save("histrogram.png");
 
-    new ICon("./testImages/_test2.jpg").addLayer("./testImages/_test1.jpg").save("done.png");
+    new ICon("./images/_test2.jpg").addLayer("./images/_test1.jpg").save("./out/done.png");
 
     if(false)//True to run the color space conversion tests
         Colors.runTests();

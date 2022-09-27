@@ -1,7 +1,9 @@
 # Custom rules
 /testImages/**
-!/testImages/_test1.jpg
-!/testImages/_test2.jpg
+
+/out/**
+# Required to preserve the file structure
+!/out/README.md 
 
 # Compiled class file
 *.class
