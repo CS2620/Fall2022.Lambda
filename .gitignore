@@ -1,3 +1,8 @@
+# Custom rules
+/testImages/**
+!/testImages/_test1.jpg
+!/testImages/_test2.jpg
+
 # Compiled class file
 *.class
 
