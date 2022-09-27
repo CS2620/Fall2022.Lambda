@@ -78,5 +78,21 @@ public class ICon {
     return new IP(bi);
     
   }
+
+  public Layer getCurrentLayer(){
+    return layers.get(currentLayer);
+  }
+
+  public ICon selectLayer(int index){
+    if(index < 0 || index >= layers.size())
+      throw new IndexOutOfBoundsException();
+    this.currentLayer = index;
+    return this;
+  }
+
+  public ICon exec(IIPLambda lambda){
+    lambda.lambda(getCurrentLayer().ip);
+    return this;
+  }
   
 }
