@@ -9,6 +9,13 @@
       "name": "Launch Main",
       "request": "launch",
       "mainClass": "Main",
+      "projectName": "Fall2022.Lambda_2753e033"
+    },
+    {
+      "type": "java",
+      "name": "Launch Main",
+      "request": "launch",
+      "mainClass": "Main",
       "projectName": "endDay09_8762090c"
     },
     {

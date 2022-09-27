@@ -101,15 +101,19 @@ public class IP extends IPBase {
     }
 
     public IP scaleLinear(float scale) {
+        return scaleLinear(scale, scale);
+    }
+
+    public IP scaleLinear(float xs, float ys) {
 
         var _bw = bufferedImage.getWidth();
         var _bh = bufferedImage.getHeight();
-        var nw = (int) (_bw * scale + .5);
-        var nh = (int) (_bh * scale + .5);
+        var nw = (int) (_bw * xs + .5);
+        var nh = (int) (_bh * ys + .5);
         return updateImageAndSize(nw, nh, (bi, bw, bh, x, y) -> {
 
-            float originalX = (x / scale);
-            float originalY = (y / scale);
+            float originalX = (x / xs);
+            float originalY = (y / ys);
 
             Color color;
             if (!MyMath.inBounds(bw, bh, (int) originalX, (int) originalY))
@@ -123,14 +127,19 @@ public class IP extends IPBase {
 
     public IP scaleNN(float scale) {
 
+        return this.scaleNN(scale, scale);
+    }
+
+    public IP scaleNN(float xs, float ys) {
+
         var _bw = bufferedImage.getWidth();
         var _bh = bufferedImage.getHeight();
-        var nw = (int) (_bw * scale + .5);
-        var nh = (int) (_bh * scale + .5);
+        var nw = (int) (_bw * xs + .5);
+        var nh = (int) (_bh * ys + .5);
         return updateImageAndSize(nw, nh, (bi, bw, bh, x, y) -> {
 
-            float originalX = (x / scale);
-            float originalY = (y / scale);
+            float originalX = (x / xs);
+            float originalY = (y / ys);
 
             Color color;
             if (!MyMath.inBounds(bw, bh, (int) originalX, (int) originalY))

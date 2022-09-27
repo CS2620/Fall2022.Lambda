@@ -3,8 +3,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import javax.imageio.ImageIO;
 
 /**
  * The Image Container class
@@ -98,6 +98,33 @@ public class ICon {
 
   public ICon generateLayer(ILayerLambda lambda) {
     addLayer(lambda.lambda(getCurrentLayer().clone()));
+    return this;
+  }
+
+  public ICon addToCanvasSize(int deltaX, int deltaY){
+    width += deltaX;
+    height += deltaY;
+    return this;
+  }
+
+  public ICon moveLayer(int deltaX, int deltaY){
+    getCurrentLayer().offsetX += deltaX;
+    getCurrentLayer().offsetY += deltaY;
+    return this;
+  }
+
+  public ICon setBackgroundColor(Color inColor){
+    backgroundColor = inColor;
+    return this;
+  }
+
+  public ICon setAsWidth(AtomicInteger ai){
+    ai.set(width);
+    return this;
+  }
+
+  public ICon setAsHeight(AtomicInteger ai){
+    ai.set(height);
     return this;
   }
 

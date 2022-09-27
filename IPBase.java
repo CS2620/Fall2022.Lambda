@@ -174,7 +174,7 @@ public abstract class IPBase {
    * @return True if (x,y) is within ([0,width),[0,height)), false othewise
    */
   public boolean isValidCoordinate(int x, int y){
-    return x > 0 && y > 0 && x < bufferedImage.getWidth() && y < bufferedImage.getHeight();
+    return x >= 0 && y >= 0 && x < bufferedImage.getWidth() && y < bufferedImage.getHeight();
 
   }
 
