@@ -35,7 +35,7 @@ public class Main {
         new ICon("./images/" + filename + ".jpg")
             .setAsWidth(width)
             .setAsHeight(height)
-            .addToCanvasSize(0, 100*4)
+            .addToCanvasSize(0, 100)
             .generateLayer(l -> l.exec(i -> i.toHistogram()))
             .moveLayer(0, height.get())
             .exec(ip -> ip.scaleLinear(width.get() / 255.0f, 1))
