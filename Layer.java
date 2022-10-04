@@ -6,7 +6,8 @@ public class Layer {
   IP ip;
   int offsetX = 0;
   int offsetY = 0;
-  float alpha = 0;
+  float alpha = 1; //0 is full transparency, 1 is full opacity
+  BlendMode blendMode = BlendMode.Normal;
   Color backgroundColor = Color.BLACK;
 
   public Layer(String filename){

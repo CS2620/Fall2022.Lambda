@@ -26,4 +26,12 @@ public class MyMath {
   public static boolean inBounds(int w, int h, float x, float y){
     return inBounds(w,h,(int)x,(int)y);
   }
+
+  public static int[] clamp(int[] blendedColors) {
+    return new int[]{
+      Math.max(0, Math.min(255, blendedColors[0])),
+      Math.max(0, Math.min(255, blendedColors[1])),
+      Math.max(0, Math.min(255, blendedColors[2])),
+    };
+  }
 }
