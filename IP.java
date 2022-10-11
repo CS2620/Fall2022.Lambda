@@ -358,4 +358,16 @@ public class IP extends IPBase {
 
         return this;
     }
+
+    public IP bitSlice(int i) {
+
+        updatePixels(c -> {
+            int value = c.getRed();
+            int result = value & i;
+            result *= 255/(float)i;
+            return new Color(result, result, result);
+        });
+    
+      return this;
+    }
 }
