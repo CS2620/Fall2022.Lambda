@@ -10,22 +10,21 @@ public class Main {
     }
 
     new ICon("./images/_test1.jpg")
-        .exec(i -> i.toGrayscale())
-        .exec(i->i.bitSlice(0b01000000))
+        .exec(i->i.bitSlice(0b00000001))
         .save("./out/bitSlicing.png");
 
-    if(true){
+    if(false){
       for(int inc = 0; inc < 8; inc++){
         int a = inc;
         new ICon("./images/_test1.jpg")
-        .exec(i -> i.toGrayscale())
+        //.exec(i -> i.toGrayscale())
         .exec(i->i.bitSlice((int)Math.pow(2, a)))
         .save("./out/bitSlicing" + a + ".png");
       }
       
     }
 
-    if(true){
+    if(false){
       for(int inc = 0; inc < 8; inc++){
         int a = 0b11111111;
         a >>= inc;
@@ -33,20 +32,20 @@ public class Main {
         int b = a;
         int c = inc;
         new ICon("./images/_test1.jpg")
-        .exec(i -> i.toGrayscale())
+        //.exec(i -> i.toGrayscale())
         .exec(i->i.bitSlice(b))
         .save("./out/bitSlicing_" + c + ".png");
       }
       
     }
 
-    if(true){
+    if(false){
       for(int inc = 0; inc < 8; inc++){
         int a = (int)(Math.pow(2, inc)-1);
         int b = a;
         int c = inc;
         new ICon("./images/_test1.jpg")
-        .exec(i -> i.toGrayscale())
+        //.exec(i -> i.toGrayscale())
         .exec(i->i.bitSlice(b))
         .save("./out/bitSlicing__" + c + ".png");
       }

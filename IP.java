@@ -362,10 +362,18 @@ public class IP extends IPBase {
     public IP bitSlice(int i) {
 
         updatePixels(c -> {
-            int value = c.getRed();
-            int result = value & i;
-            result *= 255/(float)i;
-            return new Color(result, result, result);
+            int r = c.getRed();
+            int r2 = r & i;
+            r2 *= 255/(float)i;
+
+            int g = c.getGreen();
+            int g2 = g & i;
+            g2 *= 255/(float)i;
+
+            int b = c.getBlue();
+            int b2 = b & i;
+            b2 *= 255/(float)i;
+            return new Color(r2, g2, b2);
         });
     
       return this;
