@@ -10,21 +10,55 @@ public class Main {
     }
 
     MutableFloat mf = new MutableFloat(0);
+    MutableInt colorCount = new MutableInt(0);
+
+    // new ICon("./images/_test1.jpg")
+    // .exec(l -> {
+    // colorCount.setValue(l.getColorCount());
+    // return null;
+    // });
+    // System.out.println(colorCount.getValue());
+
+    // var f = new ICon("./images/_test1.jpg")
+    // .flatten().getColorsOrderedByFrequency();
+
+    // for (int i = 0; i < f.length && i < 10; i++) {
+    // Color c = new Color((Integer) f[i]);
+    // System.out.println(c);
+    // }
+    // System.out.println(colorCount.getValue());
+
+    // Use a reduced color palette
     new ICon("./images/_test1.jpg")
-        .exec(i -> i.toGrayscale())
-        .exec(i -> i.bitSlice(0b10000000))
-        .addLayer("./images/_test1.jpg")
-        .exec(i -> i.toGrayscale())
-        .setLayerBlendmode(BlendMode.SubtractAbs)
-        .flatten()
         .exec(l -> {
-          mf.setValue(l.averagePixelError());
+          l.updateToPallette(l.getColorsOrderedByFrequency(10));
           return null;
-        });
+        })
+        .save("./out/palette.png");
+
+    //Use a reduced color palette based on k-means
+    new ICon("./images/_test1.jpg")
+        .exec(l -> {
+          l.updateToPallette(l.kMeansColors(128));
+          return null;
+        })
+        .save("./out/k_means.png");
+
+    // new ICon("./images/_test1.jpg")
+    // .exec(i -> i.toGrayscale())
+    // .exec(i -> i.bitSlice(0b10000000))
+    // .addLayer("./images/_test1.jpg")
+    // .exec(i -> i.toGrayscale())
+    // .setLayerBlendmode(BlendMode.SubtractAbs)
+    // .flatten()
+    // .exec(l -> {
+    // mf.setValue(l.averagePixelError());
+    // return null;
+    // });
     // .save("./out/mf.png");
 
-    System.out.println(Integer.toBinaryString(0b10000000));
-    System.out.println(mf.value);
+    // System.out.println(Integer.toBinaryString(0b10000000));
+    // System.out.println(mf.value);
 
     // .save("./out/difference_image.png");
 
@@ -39,8 +73,8 @@ public class Main {
 
     // }
 
-    //Get the error values for cummulative bit slices
-    if (true) {
+    // Get the error values for cummulative bit slices
+    if (false) {
       for (int inc = 0; inc < 8; inc++) {
         int a = 0b11111111;
         a >>= inc;
@@ -51,7 +85,7 @@ public class Main {
             .exec(i -> i.toGrayscale())
             .exec(i -> i.bitSlice(b))
             .addLayer("./images/_test1.jpg")
-            .exec(i->i.toGrayscale())
+            .exec(i -> i.toGrayscale())
             .setLayerBlendmode(BlendMode.SubtractAbs)
             .save("./out/bitSlicing_error_" + c + ".png")
             .flatten()
@@ -70,7 +104,7 @@ public class Main {
 
     }
 
-    if (false) {
+    if (true) {
       for (int inc = 0; inc < 8; inc++) {
         int a = 0b11111111;
         a >>= inc;
@@ -78,12 +112,10 @@ public class Main {
         int b = a;
         int c = inc;
         new ICon("./images/_test1.jpg")
-            .exec(i -> i.toGrayscale())
+            //.exec(i -> i.toGrayscale())
             .exec(i -> i.bitSlice(b))
             .save("./out/bitSlicing_" + c + ".png");
-            
 
-        
       }
 
     }

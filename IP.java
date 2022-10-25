@@ -3,6 +3,12 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Hashtable;
+import java.util.Map;
+
 import javax.imageio.ImageIO;
 
 public class IP extends IPBase {
@@ -364,19 +370,19 @@ public class IP extends IPBase {
         updatePixels(c -> {
             int r = c.getRed();
             int r2 = r & i;
-            r2 *= 255/(float)i;
+            r2 *= 255 / (float) i;
 
             int g = c.getGreen();
             int g2 = g & i;
-            g2 *= 255/(float)i;
+            g2 *= 255 / (float) i;
 
             int b = c.getBlue();
             int b2 = b & i;
-            b2 *= 255/(float)i;
+            b2 *= 255 / (float) i;
             return new Color(r2, g2, b2);
         });
-    
-      return this;
+
+        return this;
     }
 
     public float averagePixelError() {
@@ -389,20 +395,189 @@ public class IP extends IPBase {
 
                 Color original = new Color(bufferedImage.getRGB(x, y));
 
-               sumError  += original.getRed() + original.getGreen() + original.getBlue();
+                sumError += original.getRed() + original.getGreen() + original.getBlue();
 
             }
         }
 
-        float error = sumError / (float)(bw*bh);
-        error /= 3; //Keeps it within [0,255]
+        float error = sumError / (float) (bw * bh);
+        error /= 3; // Keeps it within [0,255]
         return error;
     }
 
-    public IP exec(IIPLambda lambda){
+    public IP exec(IIPLambda lambda) {
         lambda.lambda(this);
         return this;
     }
 
-    
+    public int[] getColorsOrderedByFrequency(int maxValue) {
+        var done = MyMath.sortValueReverse(getColorCounts());
+        int[] toReturn = new int[Math.min(done.size(), maxValue)];
+
+        for (int i = 0; i < toReturn.length; i++) {
+            Map.Entry<Integer, Integer> me = (Map.Entry<Integer, Integer>) done.get(i);
+            toReturn[i] = me.getKey();
+        }
+
+        return toReturn;
+
+    }
+
+    public Hashtable<Integer, Integer> getColorCounts() {
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+
+        Hashtable<Integer, Integer> colors = new Hashtable<>();
+
+        for (var y = 0; y < bh; y++) {
+            for (var x = 0; x < bw; x++) {
+
+                Color original = new Color(bufferedImage.getRGB(x, y));
+                int intCode = original.getRGB();
+
+                if (!colors.containsKey(intCode)) {
+                    colors.put(intCode, 0);
+                }
+                colors.put(intCode, colors.get(intCode) + 1);
+            }
+        }
+
+        return colors;
+    }
+
+    public int getColorCount() {
+
+        return getColorCounts().size();
+    }
+
+    public IP updateToPallette(int[] palette) {
+
+        Color[] colorPalette = new Color[palette.length];
+        for (int i = 0; i < palette.length; i++) {
+            colorPalette[i] = new Color(palette[i]);
+        }
+
+        updatePixels(c -> {
+            Color proposed = findClosestPaletteColor(c, colorPalette);
+            return proposed;
+        });
+
+        return this;
+    }
+
+    public Color findClosestPaletteColor(Color original, int[] _colorPalette) {
+        Color[] colorPalette = new Color[_colorPalette.length];
+
+        for (int i = 0; i < colorPalette.length; i++) {
+            colorPalette[i] = new Color(_colorPalette[i]);
+        }
+        return findClosestPaletteColor(original, colorPalette);
+    }
+
+    public Color findClosestPaletteColor(Color original, Color[] colorPalette) {
+        int minDistance = Integer.MAX_VALUE;
+        int minIndex = -1;
+
+        for (int i = 0; i < colorPalette.length; i++) {
+            int distance = MyMath.LInfDistance(original, colorPalette[i]);
+            if (distance < minDistance) {
+                minDistance = distance;
+                minIndex = i;
+            }
+        }
+        return colorPalette[minIndex];
+    }
+
+    public int findClosestPaletteColorIndex(Color original, int[] _colorPalette) {
+        Color[] colorPalette = new Color[_colorPalette.length];
+
+        for (int i = 0; i < colorPalette.length; i++) {
+            colorPalette[i] = new Color(_colorPalette[i]);
+        }
+        return findClosestPaletteColorIndex(original, colorPalette);
+    }
+
+    public int findClosestPaletteColorIndex(Color original, Color[] colorPalette) {
+        int minDistance = Integer.MAX_VALUE;
+        int minIndex = -1;
+
+        for (int i = 0; i < colorPalette.length; i++) {
+            int distance = MyMath.LInfDistance(original, colorPalette[i]);
+            if (distance < minDistance) {
+                minDistance = distance;
+                minIndex = i;
+            }
+        }
+        return minIndex;
+    }
+
+    public int[] kMeansColors(int count) {
+
+        System.out.println("Doing k means with a size of " + count);
+
+        int[] palette = new int[count];
+        Color[] paletteColors = new Color[count];
+        ArrayList<Color>[] foundColors = new ArrayList[count];
+
+        for (int i = 0; i < palette.length; i++) {
+            paletteColors[i] = MyMath.randomColor();
+            palette[i] = paletteColors[i].getRGB();
+            foundColors[i] = new ArrayList<Color>();
+        }
+
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+
+        ArrayList<Color> toChooseFrom = new ArrayList<>();
+        for (int j = 0; j < 10; j++) {
+
+            for (var y = 0; y < bh; y++) {
+                for (var x = 0; x < bw; x++) {
+                    if (x != y)
+                        continue;
+                    Color original = new Color(bufferedImage.getRGB(x, y));
+
+                    toChooseFrom.add(original);
+                }
+            }
+        }
+
+        for (int j = 0; j < 1; j++) {
+
+            for (var k = 0; k < toChooseFrom.size(); k++) {
+                Color original = toChooseFrom.get(k);
+
+                int bestIndex = findClosestPaletteColorIndex(original, paletteColors);
+                foundColors[bestIndex].add(original);
+            }
+
+            for (int i = 0; i < count; i++) {
+                ArrayList<Color> colors = foundColors[i];
+                if (colors.size() == 0) {
+                    palette[i] = MyMath.randomColor().getRGB();
+                    continue;
+                }
+                long averageR = 0;
+                long averageG = 0;
+                long averageB = 0;
+
+                for (Color color : colors) {
+                    averageR += color.getRed();
+                    averageG += color.getGreen();
+                    averageB += color.getBlue();
+                }
+
+                float r = averageR / (float) colors.size();
+                float g = averageG / (float) colors.size();
+                float b = averageB / (float) colors.size();
+
+                // Move the color to the mean position
+                paletteColors[i] = new Color((int) r, (int) g, (int) b);
+                palette[i] = paletteColors[i].getRGB();
+            }
+        }
+
+        return palette;
+    }
+
 }
