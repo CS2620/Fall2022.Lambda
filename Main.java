@@ -9,47 +9,96 @@ public class Main {
       return;
     }
 
+    MutableFloat mf = new MutableFloat(0);
     new ICon("./images/_test1.jpg")
-        .exec(i->i.bitSlice(0b00000001))
-        .save("./out/bitSlicing.png");
+        .exec(i -> i.toGrayscale())
+        .exec(i -> i.bitSlice(0b10000000))
+        .addLayer("./images/_test1.jpg")
+        .exec(i -> i.toGrayscale())
+        .setLayerBlendmode(BlendMode.SubtractAbs)
+        .flatten()
+        .exec(l -> {
+          mf.setValue(l.averagePixelError());
+          return null;
+        });
+    // .save("./out/mf.png");
 
-    if(false){
-      for(int inc = 0; inc < 8; inc++){
-        int a = inc;
-        new ICon("./images/_test1.jpg")
-        //.exec(i -> i.toGrayscale())
-        .exec(i->i.bitSlice((int)Math.pow(2, a)))
-        .save("./out/bitSlicing" + a + ".png");
-      }
-      
-    }
+    System.out.println(Integer.toBinaryString(0b10000000));
+    System.out.println(mf.value);
 
-    if(false){
-      for(int inc = 0; inc < 8; inc++){
+    // .save("./out/difference_image.png");
+
+    // if(true){
+    // for(int inc = 0; inc < 8; inc++){
+    // int a = inc;
+    // new ICon("./images/_test1.jpg")
+    // .exec(i -> i.toGrayscale())
+    // .exec(i->i.bitSlice((int)Math.pow(2, a)))
+    // .save("./out/bitSlicing" + a + ".png");
+    // }
+
+    // }
+
+    //Get the error values for cummulative bit slices
+    if (true) {
+      for (int inc = 0; inc < 8; inc++) {
         int a = 0b11111111;
         a >>= inc;
         a <<= inc;
         int b = a;
         int c = inc;
         new ICon("./images/_test1.jpg")
-        //.exec(i -> i.toGrayscale())
-        .exec(i->i.bitSlice(b))
-        .save("./out/bitSlicing_" + c + ".png");
+            .exec(i -> i.toGrayscale())
+            .exec(i -> i.bitSlice(b))
+            .addLayer("./images/_test1.jpg")
+            .exec(i->i.toGrayscale())
+            .setLayerBlendmode(BlendMode.SubtractAbs)
+            .save("./out/bitSlicing_error_" + c + ".png")
+            .flatten()
+            .exec(i -> {
+              mf.setValue(i.averagePixelError());
+              return null;
+            });
+
+        System.out.println();
+        System.out.println(b);
+        System.out.println(c);
+        String binaryString = Integer.toBinaryString(b);
+        System.out.println(binaryString);
+        System.out.println(mf);
       }
-      
+
     }
 
-    if(false){
-      for(int inc = 0; inc < 8; inc++){
-        int a = (int)(Math.pow(2, inc)-1);
+    if (false) {
+      for (int inc = 0; inc < 8; inc++) {
+        int a = 0b11111111;
+        a >>= inc;
+        a <<= inc;
         int b = a;
         int c = inc;
         new ICon("./images/_test1.jpg")
-        //.exec(i -> i.toGrayscale())
-        .exec(i->i.bitSlice(b))
-        .save("./out/bitSlicing__" + c + ".png");
+            .exec(i -> i.toGrayscale())
+            .exec(i -> i.bitSlice(b))
+            .save("./out/bitSlicing_" + c + ".png");
+            
+
+        
       }
-      
+
+    }
+
+    if (false) {
+      for (int inc = 0; inc < 8; inc++) {
+        int a = (int) (Math.pow(2, inc) - 1);
+        int b = a;
+        int c = inc;
+        new ICon("./images/_test1.jpg")
+            // .exec(i -> i.toGrayscale())
+            .exec(i -> i.bitSlice(b))
+            .save("./out/bitSlicing__" + c + ".png");
+      }
+
     }
 
     AtomicInteger width = new AtomicInteger(-1);

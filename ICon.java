@@ -101,6 +101,9 @@ public class ICon {
             case Subtract:
               blendedColors = blend(incomingColors, currentColors, (a, b) -> a - b);
               break;
+            case SubtractAbs:
+              blendedColors = blend(incomingColors, currentColors, (a, b) -> Math.abs(a - b));
+              break;
             case Darken:
               blendedColors = blend(incomingColors, currentColors, (a, b) -> Math.min(a, b));
               break;

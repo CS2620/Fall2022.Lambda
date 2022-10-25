@@ -378,4 +378,31 @@ public class IP extends IPBase {
     
       return this;
     }
+
+    public float averagePixelError() {
+        int sumError = 0;
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+
+        for (var y = 0; y < bh; y++) {
+            for (var x = 0; x < bw; x++) {
+
+                Color original = new Color(bufferedImage.getRGB(x, y));
+
+               sumError  += original.getRed() + original.getGreen() + original.getBlue();
+
+            }
+        }
+
+        float error = sumError / (float)(bw*bh);
+        error /= 3; //Keeps it within [0,255]
+        return error;
+    }
+
+    public IP exec(IIPLambda lambda){
+        lambda.lambda(this);
+        return this;
+    }
+
+    
 }

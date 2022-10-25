@@ -27,6 +27,6 @@ public enum BlendMode {
   Lighten,
 
   DarkerColor,
-  LighterColor, Multiply, Divide,
+  LighterColor, Multiply, Divide, SubtractAbs,
 
 }
