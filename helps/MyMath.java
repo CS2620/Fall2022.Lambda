@@ -140,4 +140,12 @@ public class MyMath {
     return toReturn;
 
   }
+
+  public static Color[] getRandomColors(int count){
+    Color[] toReturn = new Color[count];
+    for(int i = 0; i < count; i++){
+      toReturn[i] = randomColor();
+    }
+    return toReturn;
+  }
 }

@@ -414,13 +414,13 @@ public class IP extends IPBase {
         return this;
     }
 
-    public int[] getColorsOrderedByFrequency(int maxValue) {
+    public Color[] getColorsOrderedByFrequency(int maxValue) {
         var done = MyMath.sortValueReverse(getColorCounts());
-        int[] toReturn = new int[Math.min(done.size(), maxValue)];
+        Color[] toReturn = new Color[Math.min(done.size(), maxValue)];
 
         for (int i = 0; i < toReturn.length; i++) {
             Map.Entry<Integer, Integer> me = (Map.Entry<Integer, Integer>) done.get(i);
-            toReturn[i] = me.getKey();
+            toReturn[i] = new Color(me.getKey());
         }
 
         return toReturn;
@@ -454,51 +454,20 @@ public class IP extends IPBase {
         return getColorCounts().size();
     }
 
-    public IP updateToPallette(int[] palette) {
-
-        Color[] colorPalette = new Color[palette.length];
-        for (int i = 0; i < palette.length; i++) {
-            colorPalette[i] = new Color(palette[i]);
-        }
+    public IP updateToPallette(Color[] palette) {
 
         updatePixels(c -> {
-            Color proposed = findClosestPaletteColor(c, colorPalette);
-            return proposed;
-        });
+           Color proposed = findClosestPaletteColor(c, palette);
+           return proposed;
+       });
 
-        return this;
-    }
+       return this;
+   }
 
-    public Color findClosestPaletteColor(Color original, int[] _colorPalette) {
-        Color[] colorPalette = new Color[_colorPalette.length];
-
-        for (int i = 0; i < colorPalette.length; i++) {
-            colorPalette[i] = new Color(_colorPalette[i]);
-        }
-        return findClosestPaletteColor(original, colorPalette);
-    }
-
+    
     public Color findClosestPaletteColor(Color original, Color[] colorPalette) {
-        int minDistance = Integer.MAX_VALUE;
-        int minIndex = -1;
-
-        for (int i = 0; i < colorPalette.length; i++) {
-            int distance = MyMath.LInfDistance(original, colorPalette[i]);
-            if (distance < minDistance) {
-                minDistance = distance;
-                minIndex = i;
-            }
-        }
+        int minIndex = findClosestPaletteColorIndex(original, colorPalette);
         return colorPalette[minIndex];
-    }
-
-    public int findClosestPaletteColorIndex(Color original, int[] _colorPalette) {
-        Color[] colorPalette = new Color[_colorPalette.length];
-
-        for (int i = 0; i < colorPalette.length; i++) {
-            colorPalette[i] = new Color(_colorPalette[i]);
-        }
-        return findClosestPaletteColorIndex(original, colorPalette);
     }
 
     public int findClosestPaletteColorIndex(Color original, Color[] colorPalette) {
@@ -515,17 +484,15 @@ public class IP extends IPBase {
         return minIndex;
     }
 
-    public int[] kMeansColors(int count) {
+    public Color[] kMeansColors(int count) {
 
         System.out.println("Doing k means with a size of " + count);
 
-        int[] palette = new int[count];
         Color[] paletteColors = new Color[count];
         ArrayList<Color>[] foundColors = new ArrayList[count];
 
-        for (int i = 0; i < palette.length; i++) {
+        for (int i = 0; i < paletteColors.length; i++) {
             paletteColors[i] = MyMath.randomColor();
-            palette[i] = paletteColors[i].getRGB();
             foundColors[i] = new ArrayList<Color>();
         }
 
@@ -547,6 +514,9 @@ public class IP extends IPBase {
         }
 
         for (int j = 0; j < 1; j++) {
+            for (int i = 0; i < paletteColors.length; i++) {
+                foundColors[i] = new ArrayList<Color>();
+            }
 
             for (var k = 0; k < toChooseFrom.size(); k++) {
                 Color original = toChooseFrom.get(k);
@@ -558,7 +528,7 @@ public class IP extends IPBase {
             for (int i = 0; i < count; i++) {
                 ArrayList<Color> colors = foundColors[i];
                 if (colors.size() == 0) {
-                    palette[i] = MyMath.randomColor().getRGB();
+                    paletteColors[i] = MyMath.randomColor();
                     continue;
                 }
                 long averageR = 0;
@@ -577,11 +547,10 @@ public class IP extends IPBase {
 
                 // Move the color to the mean position
                 paletteColors[i] = new Color((int) r, (int) g, (int) b);
-                palette[i] = paletteColors[i].getRGB();
             }
         }
 
-        return palette;
+        return paletteColors;
     }
 
 }
