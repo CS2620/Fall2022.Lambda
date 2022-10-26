@@ -1,9 +1,16 @@
+package ip;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
+
+import helps.MutableInt;
+import helps.MyMath;
+import helps.lambdas.IBlend;
+import helps.lambdas.IBlendColor;
+import helps.lambdas.IIPLambda;
+import helps.lambdas.ILayerLambda;
 
 /**
  * The Image Container class
@@ -84,9 +91,7 @@ public class ICon {
           int incomingGreen = incomingPixel.getGreen();
           int incomingBlue = incomingPixel.getBlue();
 
-          int blendedRed = incomingRed;
-          int blendedGreen = incomingGreen;
-          int blendedBlue = incomingBlue;
+          
 
           int[] incomingColors = new int[] { incomingRed, incomingGreen, incomingBlue };
           int[] currentColors = new int[] { currentRed, currentGreen, currentBlue };
@@ -205,13 +210,13 @@ public class ICon {
     return this;
   }
 
-  public ICon setAsWidth(AtomicInteger ai) {
-    ai.set(width);
+  public ICon setAsWidth(MutableInt ai) {
+    ai.setValue(width);
     return this;
   }
 
-  public ICon setAsHeight(AtomicInteger ai) {
-    ai.set(height);
+  public ICon setAsHeight(MutableInt ai) {
+    ai.setValue(height);
     return this;
   }
 

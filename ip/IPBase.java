@@ -1,3 +1,4 @@
+package ip;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
@@ -5,6 +6,10 @@ import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
 import javax.imageio.ImageIO;
+
+import helps.MyMath;
+import helps.lambdas.IColorToColor;
+import helps.lambdas.IUpdateLambda;
 
 public abstract class IPBase {
   BufferedImage bufferedImage;
@@ -53,9 +58,7 @@ public abstract class IPBase {
   }
 
   public IP updateImageAndSize(int nw, int nh, IUpdateLambda lambda) {
-    int bw = bufferedImage.getWidth();
-    int bh = bufferedImage.getHeight();
-
+    
     BufferedImage intermediate = new BufferedImage(nw, nh, BufferedImage.TYPE_INT_ARGB);
     for (int y = 0; y < nh; y++) {
       for (int x = 0; x < nw; x++) {

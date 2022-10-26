@@ -1,3 +1,4 @@
+package ip;
 //See https://photoblogstop.com/photoshop/photoshop-blend-modes-explained
 //See also 11.3.3 from https://opensource.adobe.com/dc-acrobat-sdk-docs/standards/pdfstandards/pdf/PDF32000_2008.pdf
 public enum BlendMode {

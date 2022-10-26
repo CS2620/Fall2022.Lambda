@@ -1,5 +1,6 @@
+package helps;
 public class MutableFloat {
-    float value;
+    public float value;
     public MutableFloat(float value){
       this.value = value;
     }

@@ -1,2 +1,5 @@
-# Fall2022.CodePrep
-Where I keep code that isn't ready to be unleashed on innocent students yet.
+# Fall2022.Lambda
+
+Reference implementation for CSCI 2620 - Computer Graphics: Image Processing, Fall 2022
+
+

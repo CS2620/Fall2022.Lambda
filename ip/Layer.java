@@ -1,5 +1,8 @@
+package ip;
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+
+import helps.lambdas.IIPLambda;
 
 
 public class Layer {
