@@ -148,4 +148,10 @@ public class MyMath {
     }
     return toReturn;
   }
+
+  public static int L1Distance(int[] original, Color color) {
+    return Math.abs(original[0] - color.getRed()) +
+        Math.abs(original[1] - color.getGreen()) +
+        Math.abs(original[2] - color.getBlue());
+  }
 }

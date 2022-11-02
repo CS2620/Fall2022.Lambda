@@ -54,10 +54,12 @@ public class Main {
       System.out.println(c);
     }
 
+    int countColors = 256;
+
     // Use a reduced color palette
     new ICon("./images/_test1.jpg")
         .exec(l -> {
-          l.updateToPallette(l.getColorsOrderedByFrequency(10));
+          l.updateToPalette(l.getColorsOrderedByFrequency(countColors));
           return null;
         })
         .save("./out/palette.png");
@@ -65,7 +67,7 @@ public class Main {
     // Use a random color palette
     new ICon("./images/_test1.jpg")
         .exec(l -> {
-          l.updateToPallette(helps.MyMath.getRandomColors(10));
+          l.updateToPalette(helps.MyMath.getRandomColors(countColors));
           return null;
         })
         .save("./out/palette-random.png");
@@ -73,10 +75,27 @@ public class Main {
     // Use a reduced color palette based on k-means
     new ICon("./images/_test1.jpg")
         .exec(l -> {
-          l.updateToPallette(l.kMeansColors(128));
+          l.updateToPalette(l.kMeansColors(countColors));
           return null;
         })
         .save("./out/k_means.png");
+
+    // Simple Dithering
+    new ICon("./images/_test1.jpg")
+        .exec(l -> {
+          l.updateToPaletteDithered(new Color[] { Color.BLACK, Color.WHITE });
+          return null;
+        })
+        .save("./out/dithered_bw.png");
+
+    // Simple Dithering Color
+    new ICon("./images/_test1.jpg")
+        .exec(l -> {
+          l.updateToPaletteDithered(l.kMeansColors(countColors));
+          return null;
+        })
+        .save("./out/dithered_color.png");
+    
 
     // Examples of useage. To save time, these are guarded by if statements.
     // ----------------------------------------------------------

@@ -1,4 +1,5 @@
 package ip;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -454,17 +455,16 @@ public class IP extends IPBase {
         return getColorCounts().size();
     }
 
-    public IP updateToPallette(Color[] palette) {
+    public IP updateToPalette(Color[] palette) {
 
         updatePixels(c -> {
-           Color proposed = findClosestPaletteColor(c, palette);
-           return proposed;
-       });
+            Color proposed = findClosestPaletteColor(c, palette);
+            return proposed;
+        });
 
-       return this;
-   }
+        return this;
+    }
 
-    
     public Color findClosestPaletteColor(Color original, Color[] colorPalette) {
         int minIndex = findClosestPaletteColorIndex(original, colorPalette);
         return colorPalette[minIndex];
@@ -551,6 +551,77 @@ public class IP extends IPBase {
         }
 
         return paletteColors;
+    }
+
+    public IP updateToPaletteDithered(Color[] palette) {
+        int bw = bufferedImage.getWidth();
+        int bh = bufferedImage.getHeight();
+        BufferedImage intermediate = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB);
+
+        int errorRed = 0;
+        int errorGreen = 0;
+        int errorBlue = 0;
+
+        Triple[][] errors = new Triple[bw][bh];
+
+        for (int y = 0; y < bh; y++) {
+            for (int x = 0; x < bw; x++) {
+                errors[x][y] = new Triple();
+            }
+        }
+
+        for (int y = 0; y < bh; y++) {
+            for (int x = 0; x < bw; x++) {
+                Color color = new Color(bufferedImage.getRGB(x, y));
+
+                int[] colors = new int[3];
+                Triple errorTriple = errors[x][y];
+                colors[0] = color.getRed() - errorTriple.r;
+                colors[1] = color.getGreen() - errorTriple.g;
+                colors[2] = color.getBlue() - errorTriple.b;
+
+                Color paletteColor = findClosestPaletteColor(colors, palette);
+
+                errorRed = paletteColor.getRed() - colors[0];
+                errorGreen = paletteColor.getGreen() - colors[1];
+                errorBlue = paletteColor.getBlue() - colors[2];
+
+                Triple newError = new Triple(errorRed, errorGreen, errorBlue);
+
+                updateErrorMatrix(bw, bh, errors, x + 1, y + 0, 7 / 16f, newError);
+                updateErrorMatrix(bw, bh, errors, x + 1, y + 1, 1 / 16f, newError);
+                updateErrorMatrix(bw, bh, errors, x + 0, y + 1, 5 / 16f, newError);
+                updateErrorMatrix(bw, bh, errors, x - 1, y + 1, 3 / 16f, newError);
+
+                intermediate.setRGB(x, y, paletteColor.getRGB());
+            }
+        }
+
+        bufferedImage = intermediate;
+        return this;
+    }
+
+    private void updateErrorMatrix(int bw, int bh, Triple[][] errors, int i, int j, float scale, Triple triple) {
+        if (i < 0 || j < 0 || i >= bw || j >= bh)
+            return;
+        errors[i][j].r += triple.r * scale;
+        errors[i][j].g += triple.g * scale;
+        errors[i][j].b += triple.b * scale;
+
+    }
+
+    private Color findClosestPaletteColor(int[] original, Color[] colorPalette) {
+        int minDistance = Integer.MAX_VALUE;
+        int minIndex = -1;
+
+        for (int i = 0; i < colorPalette.length; i++) {
+            int distance = MyMath.L1Distance(original, colorPalette[i]);
+            if (distance < minDistance) {
+                minDistance = distance;
+                minIndex = i;
+            }
+        }
+        return colorPalette[minIndex];
     }
 
 }
