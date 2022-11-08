@@ -34,68 +34,73 @@ public class Main {
     // Actual image
     // processing-----------------------------------------------------------------------------------------------------
 
-    // Get the number of colors in the image
-    new ICon("./images/_test1.jpg")
-        .exec(l -> {
-          colorCount.setValue(l.getColorCount());
-          return null;
-        });
-    System.out.println();
-    System.out.println("The given image has " + colorCount.getValue() + " distinct colors.");
+    new IP("./images/_test1.jpg")
+        .saveAsPPM("./out/ppm.ppm");
 
-    // Get the most common colors
-    var f = new ICon("./images/_test1.jpg")
-        .flatten().getColorsOrderedByFrequency(10);
+    if (false) {
 
-    System.out.println();
-    System.out.println("The following are the most common colors in the given image:");
-    for (int i = 0; i < f.length && i < 10; i++) {
-      Color c = f[i];
-      System.out.println(c);
+      // Get the number of colors in the image
+      new ICon("./images/_test1.jpg")
+          .exec(l -> {
+            colorCount.setValue(l.getColorCount());
+            return null;
+          });
+      System.out.println();
+      System.out.println("The given image has " + colorCount.getValue() + " distinct colors.");
+
+      // Get the most common colors
+      var f = new ICon("./images/_test1.jpg")
+          .flatten().getColorsOrderedByFrequency(10);
+
+      System.out.println();
+      System.out.println("The following are the most common colors in the given image:");
+      for (int i = 0; i < f.length && i < 10; i++) {
+        Color c = f[i];
+        System.out.println(c);
+      }
+      int countColors = 256;
+
+      // Use a reduced color palette
+      new ICon("./images/_test1.jpg")
+          .exec(l -> {
+            l.updateToPalette(l.getColorsOrderedByFrequency(countColors));
+            return null;
+          })
+          .save("./out/palette.png");
+
+      // Use a random color palette
+      new ICon("./images/_test1.jpg")
+          .exec(l -> {
+            l.updateToPalette(helps.MyMath.getRandomColors(countColors));
+            return null;
+          })
+          .save("./out/palette-random.png");
+
+      // Use a reduced color palette based on k-means
+      new ICon("./images/_test1.jpg")
+          .exec(l -> {
+            l.updateToPalette(l.kMeansColors(countColors));
+            return null;
+          })
+          .save("./out/k_means.png");
+
+      // Simple Dithering
+      new ICon("./images/_test1.jpg")
+          .exec(l -> {
+            l.updateToPaletteDithered(new Color[] { Color.BLACK, Color.WHITE });
+            return null;
+          })
+          .save("./out/dithered_bw.png");
+
+      // Simple Dithering Color
+      new ICon("./images/_test1.jpg")
+          .exec(l -> {
+            l.updateToPaletteDithered(l.kMeansColors(countColors));
+            return null;
+          })
+          .save("./out/dithered_color.png");
+
     }
-
-    int countColors = 256;
-
-    // Use a reduced color palette
-    new ICon("./images/_test1.jpg")
-        .exec(l -> {
-          l.updateToPalette(l.getColorsOrderedByFrequency(countColors));
-          return null;
-        })
-        .save("./out/palette.png");
-
-    // Use a random color palette
-    new ICon("./images/_test1.jpg")
-        .exec(l -> {
-          l.updateToPalette(helps.MyMath.getRandomColors(countColors));
-          return null;
-        })
-        .save("./out/palette-random.png");
-
-    // Use a reduced color palette based on k-means
-    new ICon("./images/_test1.jpg")
-        .exec(l -> {
-          l.updateToPalette(l.kMeansColors(countColors));
-          return null;
-        })
-        .save("./out/k_means.png");
-
-    // Simple Dithering
-    new ICon("./images/_test1.jpg")
-        .exec(l -> {
-          l.updateToPaletteDithered(new Color[] { Color.BLACK, Color.WHITE });
-          return null;
-        })
-        .save("./out/dithered_bw.png");
-
-    // Simple Dithering Color
-    new ICon("./images/_test1.jpg")
-        .exec(l -> {
-          l.updateToPaletteDithered(l.kMeansColors(countColors));
-          return null;
-        })
-        .save("./out/dithered_color.png");
-    
 
     // Examples of useage. To save time, these are guarded by if statements.
     // ----------------------------------------------------------

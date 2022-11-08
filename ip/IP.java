@@ -5,6 +5,8 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Hashtable;
 import java.util.Map;
@@ -622,6 +624,38 @@ public class IP extends IPBase {
             }
         }
         return colorPalette[minIndex];
+    }
+
+    public void saveAsPPM(String string) {
+
+        StringBuffer toWrite = new StringBuffer("P3\n");
+        toWrite.append(this.bufferedImage.getWidth() + "\n");
+        toWrite.append(this.bufferedImage.getHeight() + "\n");
+        toWrite.append("256\n");
+
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+
+        
+        for (var y = 0; y < bh; y++) {
+            for (var x = 0; x < bw; x++) {
+
+                Color original = new Color(bufferedImage.getRGB(x, y));
+                
+                toWrite.append(original.getRed() + " ");
+                toWrite.append(original.getGreen() + " ");
+                toWrite.append(original.getBlue() + "\n");
+            }
+        }
+
+
+        String path = string;
+        try {
+            Files.write(Paths.get(path), toWrite.toString().getBytes());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 }
