@@ -34,8 +34,13 @@ public class Main {
     // Actual image
     // processing-----------------------------------------------------------------------------------------------------
 
-    new IP("./images/_test1.jpg")
-        .saveAsPPM("./out/ppm.ppm");
+    // new IP("./images/_test1.jpg")
+    //     .saveAsPPM("./out/ppm.ppm");
+
+    new IP("./images/_test1_small.jpg")
+        .saveAsBMP("./out/bmp.bmp");
+
+    
 
     if (false) {
 

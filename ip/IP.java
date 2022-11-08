@@ -4,10 +4,12 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Hashtable;
 import java.util.Map;
 
@@ -636,18 +638,16 @@ public class IP extends IPBase {
         var bw = bufferedImage.getWidth();
         var bh = bufferedImage.getHeight();
 
-        
         for (var y = 0; y < bh; y++) {
             for (var x = 0; x < bw; x++) {
 
                 Color original = new Color(bufferedImage.getRGB(x, y));
-                
+
                 toWrite.append(original.getRed() + " ");
                 toWrite.append(original.getGreen() + " ");
                 toWrite.append(original.getBlue() + "\n");
             }
         }
-
 
         String path = string;
         try {
@@ -658,4 +658,56 @@ public class IP extends IPBase {
 
     }
 
+    public void saveAsBMP(String string) {
+
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+
+        ArrayList<Integer> bytes = new ArrayList<>();
+
+        bytes.add(0x42);
+        bytes.add(0x4D);
+        bytes.addAll(Arrays.asList(new Integer[] { 0x46, 0x00, 0x00, 0x00 }));
+
+        bytes.addAll(Arrays.asList(new Integer[] { 0x00, 0x00 }));// Application Specific 1
+        bytes.addAll(Arrays.asList(new Integer[] { 0x00, 0x00 }));// Application Specific 2
+        bytes.addAll(Arrays.asList(new Integer[] { 0x36, 0x00, 0x00, 0x00 }));// Offset where the pixel array can be
+                                                                              // found
+
+        bytes.addAll(Arrays.asList(new Integer[] { 0x28, 0x00, 0x00, 0x00 }));// Number of bytes in the DIB header (from
+                                                                              // this point)
+        bytes.addAll(Arrays.asList(new Integer[] { bw, 0x00, 0x00, 0x00 }));// Width of the bitmap in pixels
+        bytes.addAll(Arrays.asList(new Integer[] { bh, 0x00, 0x00, 0x00 }));// Height of the bitmap in pixels. Positive
+                                                                            // for bottom to top pixel order.
+        bytes.addAll(Arrays.asList(new Integer[] { 0x01, 0x00 }));// Number of color planes being used
+        bytes.addAll(Arrays.asList(new Integer[] { 0x20, 0x00 }));// Number of bits per pixel
+        bytes.addAll(Arrays.asList(new Integer[] { 0x00, 0x00, 0x00, 0x00 }));// BI_RGB, no pixel array compression used
+        bytes.addAll(Arrays.asList(new Integer[] { 0x10, 0x00, 0x00, 0x00 }));// Size of the raw bitmap data (including
+                                                                              // padding)
+        bytes.addAll(Arrays.asList(new Integer[] { 0x13, 0x0B, 0x00, 0x00 }));// Print resolution of the image,
+                                                                              // horizontal
+        bytes.addAll(Arrays.asList(new Integer[] { 0x13, 0x0B, 0x00, 0x00 }));// Print resolution of the image, vertical
+        bytes.addAll(Arrays.asList(new Integer[] { 0x00, 0x00, 0x00, 0x00 }));// Number of colors in the palette
+        bytes.addAll(Arrays.asList(new Integer[] { 0x00, 0x00, 0x00, 0x00 }));// 0 means all colors are important
+
+
+        for (var y = bh - 1; y >= 0; y--) {
+            for (var x = 0; x < bw; x++) {
+                Color original = new Color(bufferedImage.getRGB(x, y));
+
+                bytes.addAll(Arrays.asList(new Integer[] {original.getBlue(), original.getGreen(), original.getRed(), 0xFF}));
+            
+            
+    
+            }
+        }
+        try (FileOutputStream fos = new FileOutputStream(string)) {
+            for (var i : bytes) {
+                int a = i;
+                fos.write(new byte[] { (byte) a });
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 }
