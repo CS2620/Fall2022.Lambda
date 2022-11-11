@@ -1,6 +1,7 @@
 package ip;
 // Some code based on https://www.geeksforgeeks.org/program-change-rgb-color-model-hsv-color-model/
   
+import java.awt.Color;
 
 public class Colors {
 
@@ -47,6 +48,10 @@ public class Colors {
     System.out.println(hsv[0] + ", " + hsv[1] + ", " + hsv[2]);
   }
 
+  static float[] rgb_to_hsv(Color color){
+    return rgb_to_hsv(color.getRed(), color.getGreen(), color.getBlue());
+  }
+
   static float[] rgb_to_hsv(float r, float g, float b) {
     float cmax = Math.max(r, Math.max(g, b));
     float cmin = Math.min(r, Math.min(g, b));
@@ -79,6 +84,10 @@ public class Colors {
     return new float[] { h, s, v };
 
   }
+
+  // public static float[] hsvToRgb(Color color){
+  //   return hsvToRgb(color.getRed(), color.getGreen(), color.getBlue());
+  // }
 
   public static float[] hsvToRgb(float hue, float saturation, float value) {
 

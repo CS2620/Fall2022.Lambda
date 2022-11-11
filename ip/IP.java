@@ -16,7 +16,9 @@ import java.util.Map;
 import javax.imageio.ImageIO;
 
 import helps.MyMath;
+import helps.lambdas.IColorToColor;
 import helps.lambdas.IIPLambda;
+import helps.lambdas.IIntToInt;
 
 //Suppress the fact that we aren't checking generics
 @SuppressWarnings("unchecked")
@@ -46,6 +48,23 @@ public class IP extends IPBase {
         return updatePixels(c -> {
             int gray = (c.getRed() + c.getGreen() + c.getBlue()) / 3;
             return new Color(gray, gray, gray);
+        });
+    }
+
+    public IP remap(IColorToColor lambda) {
+        return updatePixels(c -> lambda.toColor(c));
+    }
+
+    public IP remapValue(IIntToInt lambda) {
+        return updatePixels(c -> {
+            float[] hsv = Colors.rgb_to_hsv(c);
+            float value = hsv[2];
+
+            value = lambda.run((int)value);
+
+            float[] newRGB = Colors.hsvToRgb(hsv[0], hsv[1], value);
+
+            return new Color((int) newRGB[0], (int) newRGB[1], (int) newRGB[2]);
         });
     }
 
@@ -690,15 +709,13 @@ public class IP extends IPBase {
         bytes.addAll(Arrays.asList(new Integer[] { 0x00, 0x00, 0x00, 0x00 }));// Number of colors in the palette
         bytes.addAll(Arrays.asList(new Integer[] { 0x00, 0x00, 0x00, 0x00 }));// 0 means all colors are important
 
-
         for (var y = bh - 1; y >= 0; y--) {
             for (var x = 0; x < bw; x++) {
                 Color original = new Color(bufferedImage.getRGB(x, y));
 
-                bytes.addAll(Arrays.asList(new Integer[] {original.getBlue(), original.getGreen(), original.getRed(), 0xFF}));
-            
-            
-    
+                bytes.addAll(Arrays
+                        .asList(new Integer[] { original.getBlue(), original.getGreen(), original.getRed(), 0xFF }));
+
             }
         }
         try (FileOutputStream fos = new FileOutputStream(string)) {
@@ -710,4 +727,5 @@ public class IP extends IPBase {
             e.printStackTrace();
         }
     }
+
 }
