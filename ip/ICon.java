@@ -1,4 +1,5 @@
 package ip;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -91,8 +92,6 @@ public class ICon {
           int incomingGreen = incomingPixel.getGreen();
           int incomingBlue = incomingPixel.getBlue();
 
-          
-
           int[] incomingColors = new int[] { incomingRed, incomingGreen, incomingBlue };
           int[] currentColors = new int[] { currentRed, currentGreen, currentBlue };
           int[] blendedColors = new int[] { incomingRed, incomingGreen, incomingBlue };
@@ -116,16 +115,17 @@ public class ICon {
               blendedColors = blend(incomingColors, currentColors, (a, b) -> Math.max(a, b));
               break;
             case DarkerColor:
-              blendedColors = blend(incomingColors, currentColors, (a,b,k1,k2)->k1>k2?b:a);
+              blendedColors = blend(incomingColors, currentColors, (a, b, k1, k2) -> k1 > k2 ? b : a);
               break;
             case LighterColor:
-              blendedColors = blend(incomingColors, currentColors, (a,b,k1,k2)->k1<k2?b:a);
+              blendedColors = blend(incomingColors, currentColors, (a, b, k1, k2) -> k1 < k2 ? b : a);
               break;
             case Multiply:
-              blendedColors = blend(incomingColors, currentColors, (a,b,k1,k2)->(int)(b*(k1/255.0f)));
+              blendedColors = blend(incomingColors, currentColors, (a, b, k1, k2) -> (int) (b * (k1 / 255.0f)));
               break;
             case Divide:
-              blendedColors = blend(incomingColors, currentColors, (a,b)->(int)((b/255.0f)/(a/255.0f)*255f));
+              blendedColors = blend(incomingColors, currentColors,
+                  (a, b) -> (int) ((b / 255.0f) / (a / 255.0f) * 255f));
               break;
             default:
               System.out.println("Encountered an unknown blend mode");
@@ -227,6 +227,20 @@ public class ICon {
 
   public ICon setLayerBlendmode(BlendMode blendMode) {
     getCurrentLayer().blendMode = blendMode;
+    return this;
+  }
+
+  public ICon appendHistogram() {
+
+    int height = this.getCurrentLayer().ip.height();
+    int width = this.getCurrentLayer().ip.width();
+
+    this.addToCanvasSize(0, 100)
+        .generateLayer(l -> l.exec(i -> i.toHistogram()))
+        .moveLayer(0, height)
+        .exec(ip -> ip.scaleLinear(width / 255.0f, 1))
+        .setBackgroundColor(Color.MAGENTA);
+
     return this;
   }
 

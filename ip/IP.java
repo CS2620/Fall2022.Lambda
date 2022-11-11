@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 
 import helps.MyMath;
 import helps.lambdas.IColorToColor;
+import helps.lambdas.IFloatToFloat;
 import helps.lambdas.IIPLambda;
 import helps.lambdas.IIntToInt;
 
@@ -55,12 +56,36 @@ public class IP extends IPBase {
         return updatePixels(c -> lambda.toColor(c));
     }
 
-    public IP remapValue(IIntToInt lambda) {
+    public IP remapValueFloat(IFloatToFloat lambda){
+        
+        for(float i = 0; i < 1; i+=.1f){
+            System.out.println(i +" -> " + lambda.run(i));
+        }
+        
+        return updatePixels(c -> {
+            float[] hsv = Colors.rgb_to_hsv(c);
+            float value = hsv[2];
+            float valueFloat = value/255f;
+
+            valueFloat = lambda.run(valueFloat);
+            value = (int)(valueFloat * 255f);
+            if(value < 0) value = 0;
+            if(value > 255) value = 255;
+
+            float[] newRGB = Colors.hsvToRgb(hsv[0], hsv[1], value);
+
+            return new Color((int) newRGB[0], (int) newRGB[1], (int) newRGB[2]);
+        });
+    }
+
+    public IP remapValueInt(IIntToInt lambda) {
         return updatePixels(c -> {
             float[] hsv = Colors.rgb_to_hsv(c);
             float value = hsv[2];
 
             value = lambda.run((int)value);
+            if(value < 0) value = 0;
+            if(value > 255) value = 255;
 
             float[] newRGB = Colors.hsvToRgb(hsv[0], hsv[1], value);
 
@@ -363,15 +388,20 @@ public class IP extends IPBase {
 
         // Normalize
         float max = 0;
+        float secondMax = 0;
         for (int i = 0; i < 256; i++) {
             if (histogram[i] > max) {
+                secondMax = max;
                 max = histogram[i];
             }
         }
 
+        if(max > secondMax * 2 && secondMax != 0){
+            max = secondMax;
+        }
+
         for (int i = 0; i < 256; i++) {
             histogram[i] /= max;
-
         }
 
         Graphics g = intermediate.getGraphics();

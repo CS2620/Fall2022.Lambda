@@ -48,24 +48,69 @@ public class Main {
         }))
         .save("./out/remap.png");
 
-    ICon grayscale = new ICon("./images/_test1.jpg").exec(i -> i.toGrayscale());
-    grayscale.save("./out/grayscale.png");
+    String grayscalePath = "./images/lung_infection.jpg";
+    // ICon grayscale = new ICon(grayscalePath).exec(i -> i.toGrayscale());
+
+    // ICon grayscaleHistogram = new ICon(grayscalePath)
+    //     .exec(i -> i.toGrayscale())
+    //     .appendHistogram().save("./out/grayscale.png");
 
     // grayscale
-    //     .exec(i -> i.remapValue(v -> 255 - v))
-    //     .save("./out/remapInverse.png");
+    // .exec(i -> i.remapValue(v -> 255 - v))
+    // .save("./out/remapInverse.png");
 
     // grayscale
-    //     .exec(i -> i.remapValue(v -> {
-    //       return (int)(Math.log(v/255.0f + 1)*255);
+    // .exec(i -> i.remapValue(v -> {
+    // return (int)(Math.log(v/255.0f + 1)*255);
+    // }))
+    // .save("./out/remapLog.png");
+
+    // new ICon(grayscalePath)
+    //     .exec(i -> i.toGrayscale())
+    //     .exec(i -> i.remapValueFloat(v -> {
+    //       return (float) Math.pow(v, .5);
     //     }))
-    //     .save("./out/remapLog.png");
+    //     .appendHistogram()
+    //     .save("./out/remapGammaRoot.png");
 
-        grayscale
-        .exec(i -> i.remapValue(v -> {
-          return (int)(Math.pow(v/255.0f,.5)*255.0f);
+    // new ICon(grayscalePath)
+    //     .exec(i -> i.toGrayscale())
+    //     .exec(i -> i.remapValueFloat(v -> {
+    //       return (float) Math.pow(v, 2);
+    //     }))
+    //     .appendHistogram()
+    //     .save("./out/remapGammaSquared.png");
+
+    new ICon(grayscalePath)
+        .exec(i -> i.toGrayscale())
+        .exec(i -> i.remapValueFloat(v -> {
+          float startX = .3f;
+          float startY = .01f;
+          float stopX = .9f;
+          float stopY = .99f;
+          float startSlope = startY/startX;
+          float stopSlope = stopY/stopX;
+          float middleSlope = (stopY - startY)/(stopX - startX);
+          if(v < startX ) return v * startSlope;
+          if(v > stopX){
+            return (v-stopX)*stopSlope + stopX;
+          }
+          return (v-startX)*middleSlope+startX;
         }))
-        .save("./out/remapGamma.png");
+        .appendHistogram()
+        .save("./out/remapPiecewise.png");
+
+    /*
+     * new ICon("./images/" + filename + ".jpg")
+     * .setAsWidth(width)
+     * .setAsHeight(height)
+     * .addToCanvasSize(0, 100)
+     * .generateLayer(l -> l.exec(i -> i.toHistogram()))
+     * .moveLayer(0, height.getValue())
+     * .exec(ip -> ip.scaleLinear(width.getValue() / 255.0f, 1))
+     * .setBackgroundColor(Color.MAGENTA)
+     * .save("./out/" + filename + "histogram.png");
+     */
 
     // Examples of useage. To save time, these are guarded by if statements.
     // ----------------------------------------------------------
