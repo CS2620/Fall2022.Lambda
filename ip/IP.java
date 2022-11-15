@@ -824,19 +824,47 @@ public class IP extends IPBase {
 
         // Count up to 50 percent
         int midIndex = 0;
+        int minIndex = 0;
+        int maxIndex = 0;
+
+        boolean midFound = false;
+        boolean minFound = false;
+        boolean maxFound = false;
+
         float currentCount = 0;
         for (int i = 0; i < histogram.length; i++) {
             currentCount += histogram[i];
-            if (currentCount >= .5f) {
+            if (currentCount >= .05f && !minFound) {
+                minIndex = i;
+                minFound = true;
+            }
+            if (currentCount >= .5f && !midFound) {
                 midIndex = i;
-                break;
+                midFound = true;
+            }
+            if (currentCount >= .95f && !maxFound) {
+                maxIndex = i;
+                maxFound = true;
             }
         }
 
-        int offset = 128 - midIndex;
+        System.out.println(minIndex);
         System.out.println(midIndex);
+        System.out.println(maxIndex);
 
-        return this.remapValueInt(i -> i + offset);
+        int offsetMid = 128 - midIndex;
+        int finalMidIndex = midIndex;
+        System.out.println(offsetMid);
+        int scale = Math.max(Math.abs(maxIndex - midIndex), Math.abs(midIndex - minIndex));
+        System.out.println(scale);
+
+        // return this.remapValueInt(i -> i + offsetMid);
+
+        return this.remapValueInt(i -> {
+            int a = i - finalMidIndex;
+            a *= 128f/(float)scale;
+            return (int) (a + offsetMid + finalMidIndex);
+        });
     }
 
     public IP histogramEqualization() {
@@ -849,11 +877,11 @@ public class IP extends IPBase {
         float[] remap = new float[256];
 
         for (int i = 0; i < 256; i++) {
-            float h_v = (cdf[i]* 255);
+            float h_v = (cdf[i] * 255);
             remap[i] = h_v;
         }
 
-        exec(i->i.remapValueInt(in->(int)(remap[in])));
+        exec(i -> i.remapValueInt(in -> (int) (remap[in])));
 
         return this;
     }

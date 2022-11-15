@@ -36,11 +36,18 @@ public class Main {
     // processing-----------------------------------------------------------------------------------------------------
 
     if (true) { // Recenter as if it were a distribution
-      // Try to auto-adjust the image based on the histogram
-      // new ICon("./images/_test1_under.png")
-      // .exec(i -> i.centerHistogram())
-      // .appendHistogram()
-      // .save("./out/tiger_recenter_under.png");
+      //Try to auto-adjust the image based on the histogram
+
+      new ICon("./images/_test1_under.png")
+      .exec(i->i.toGrayscale())
+      .appendHistogram()
+      .save("./out/tiger_grayscale_under.png");
+
+      new ICon("./images/_test1_under.png")
+      .exec(i->i.toGrayscale())
+      .exec(i -> i.centerHistogram())
+      .appendHistogram()
+      .save("./out/tiger_recenter_under.png");
 
       // new ICon("./images/_test1_over.png")
       // .exec(i -> i.centerHistogram())
@@ -51,19 +58,19 @@ public class Main {
       // .appendHistogram()
       // .save("./out/tiger_over_h.png");
 
-      new ICon("./images/_test1_under.png")
-          .appendHistogram()
-          .save("./out/tiger_under_h.png");
-      new ICon("./images/_test1.jpg")
-          .exec(i -> i.toGrayscale())
-          .appendHistogram()
-          .save("./out/tiger_grayscale_h.png");
+      // new ICon("./images/_test1_under.png")
+      //     .appendHistogram()
+      //     .save("./out/tiger_under_h.png");
+      // new ICon("./images/_test1.jpg")
+      //     .exec(i -> i.toGrayscale())
+      //     .appendHistogram()
+      //     .save("./out/tiger_grayscale_h.png");
 
-      new ICon("./images/_test1_under.png")
-          .exec(i -> i.toGrayscale())
-          .exec(i -> i.histogramEqualization())
-          .appendHistogram()
-          .save("./out/tiger_he.png");
+      // new ICon("./images/_test1_under.png")
+      //     .exec(i -> i.toGrayscale())
+      //     .exec(i -> i.histogramEqualization())
+      //     .appendHistogram()
+      //     .save("./out/tiger_he.png");
     }
 
     if (false) { // Generate under/over with histograms
