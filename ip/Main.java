@@ -4,6 +4,7 @@ import java.awt.Color;
 
 import helps.MutableFloat;
 import helps.MutableInt;
+import helps.lambdas.IColorToColor;
 
 //Many examples are guarded by if(false) statements
 //This suppressed warning means that we are doing this on purpose
@@ -36,16 +37,32 @@ public class Main {
 
 
     new ICon("./images/_test1.jpg")
-    .setAsHeight(height)
-    .setAsWidth(width)
-    .addLayer("./images/_test1.jpg")
-    .exec(i->i.crop(0, 0, 100, 100))
-    .exec(i->i.toGrayscale())
-    .addLayer("./images/_test1.jpg")
-    .exec(i->i.crop(100, 100, 50, 50))
-    .exec(i->i.toGrayscale())
-    .moveLayer(100, 100)
-    .save("./out/cropped.png");
+    .exec(i->i.remapValueInt(x->x/2))
+    .save("./out/_test1_under.png");
+
+    new ICon("./images/_test1.jpg")
+    .exec(i->i.remapValueInt(x->x/2+127))
+    .save("./out/_test1_over.png");
+
+    // new ICon("./images/_test1.jpg")
+    // .setAsHeight(height)
+    // .setAsWidth(width)
+    // .addLayer("./images/_test1.jpg")
+    // .exec(i->i.crop(50, 50, 100, 100))
+    // .setCanvasSize(100, 100)
+    // .save("./out/cropped1.png");
+
+    // new ICon("./images/_test1.jpg")
+    // .setAsHeight(height)
+    // .setAsWidth(width)
+    // .addLayer("./images/_test1.jpg")
+    // .exec(i->i.crop(0, 0, 100, 100))
+    // .exec(i->i.toGrayscale())
+    // .addLayer("./images/_test1.jpg")
+    // .exec(i->i.crop(100, 100, 50, 50))
+    // .exec(i->i.toGrayscale())
+    // .moveLayer(100, 100)
+    // .save("./out/cropped.png");
 
     // Histogram remapping
     new ICon("./images/_test1.jpg")

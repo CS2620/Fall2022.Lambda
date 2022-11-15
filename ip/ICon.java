@@ -244,4 +244,10 @@ public class ICon {
     return this;
   }
 
+  public ICon setCanvasSize(int i, int j) {
+    width = i;
+    height = j;
+    return this;
+  }
+
 }
