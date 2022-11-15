@@ -34,6 +34,19 @@ public class Main {
     // Actual image
     // processing-----------------------------------------------------------------------------------------------------
 
+
+    new ICon("./images/_test1.jpg")
+    .setAsHeight(height)
+    .setAsWidth(width)
+    .addLayer("./images/_test1.jpg")
+    .exec(i->i.crop(0, 0, 100, 100))
+    .exec(i->i.toGrayscale())
+    .addLayer("./images/_test1.jpg")
+    .exec(i->i.crop(100, 100, 50, 50))
+    .exec(i->i.toGrayscale())
+    .moveLayer(100, 100)
+    .save("./out/cropped.png");
+
     // Histogram remapping
     new ICon("./images/_test1.jpg")
         .exec(i -> i.remap(c -> {

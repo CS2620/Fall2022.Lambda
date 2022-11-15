@@ -758,4 +758,21 @@ public class IP extends IPBase {
         }
     }
 
+    public IP crop(int startX, int startY, int w, int h) {
+        BufferedImage intermediate = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                Color color = new Color(bufferedImage.getRGB(x+startX, y+startY));
+
+                
+
+                intermediate.setRGB(x, y, color.getRGB());
+            }
+        }
+
+        bufferedImage = intermediate;
+        return this;
+    }
+
 }
