@@ -35,55 +35,106 @@ public class Main {
     // Actual image
     // processing-----------------------------------------------------------------------------------------------------
 
+    if (true) { // Recenter as if it were a distribution
+      // Try to auto-adjust the image based on the histogram
+      // new ICon("./images/_test1_under.png")
+      // .exec(i -> i.centerHistogram())
+      // .appendHistogram()
+      // .save("./out/tiger_recenter_under.png");
 
-    new ICon("./images/_test1.jpg")
-    .exec(i->i.remapValueInt(x->x/2))
-    .save("./out/_test1_under.png");
+      // new ICon("./images/_test1_over.png")
+      // .exec(i -> i.centerHistogram())
+      // .appendHistogram()
+      // .save("./out/tiger_recenter_over.png");
 
-    new ICon("./images/_test1.jpg")
-    .exec(i->i.remapValueInt(x->x/2+127))
-    .save("./out/_test1_over.png");
+      // new ICon("./images/_test1_over.png")
+      // .appendHistogram()
+      // .save("./out/tiger_over_h.png");
 
-    // new ICon("./images/_test1.jpg")
-    // .setAsHeight(height)
-    // .setAsWidth(width)
-    // .addLayer("./images/_test1.jpg")
-    // .exec(i->i.crop(50, 50, 100, 100))
-    // .setCanvasSize(100, 100)
-    // .save("./out/cropped1.png");
+      new ICon("./images/_test1_under.png")
+          .appendHistogram()
+          .save("./out/tiger_under_h.png");
+      new ICon("./images/_test1.jpg")
+          .exec(i -> i.toGrayscale())
+          .appendHistogram()
+          .save("./out/tiger_grayscale_h.png");
 
-    // new ICon("./images/_test1.jpg")
-    // .setAsHeight(height)
-    // .setAsWidth(width)
-    // .addLayer("./images/_test1.jpg")
-    // .exec(i->i.crop(0, 0, 100, 100))
-    // .exec(i->i.toGrayscale())
-    // .addLayer("./images/_test1.jpg")
-    // .exec(i->i.crop(100, 100, 50, 50))
-    // .exec(i->i.toGrayscale())
-    // .moveLayer(100, 100)
-    // .save("./out/cropped.png");
+      new ICon("./images/_test1_under.png")
+          .exec(i -> i.toGrayscale())
+          .exec(i -> i.histogramEqualization())
+          .appendHistogram()
+          .save("./out/tiger_he.png");
+    }
 
-    // Histogram remapping
-    new ICon("./images/_test1.jpg")
-        .exec(i -> i.remap(c -> {
-          float[] hsv = Colors.rgb_to_hsv(c);
-          float value = hsv[2];
+    if (false) { // Generate under/over with histograms
+      // Generate under-exposed image
+      new ICon("./images/_test1.jpg")
+          .exec(i -> i.remapValueInt(x -> x / 2))
+          .save("./out/_test1_under.png");
 
-          value = 255 - value;
+      // Generate over-exposed image
+      new ICon("./images/_test1.jpg")
+          .exec(i -> i.remapValueInt(x -> x / 2 + 127))
+          .save("./out/_test1_over.png");
 
-          float[] newRGB = Colors.hsvToRgb(hsv[0], hsv[1], value);
+      // Show the over exposed image with its histogram
+      new ICon("./images/_test1_over.png")
+          .appendHistogram()
+          .save("./images/_test1_over_h.png");
 
-          return new Color((int) newRGB[0], (int) newRGB[1], (int) newRGB[2]);
-        }))
-        .save("./out/remap.png");
+      // Show the under-exposed image with its histogram
+      new ICon("./images/_test1_under.png")
+          .appendHistogram()
+          .save("./images/_test1_under_h.png");
+    }
+
+    if (false) { // Image Cropping
+      // Crop the image to a small size
+      new ICon("./images/_test1.jpg")
+          .setAsHeight(height)
+          .setAsWidth(width)
+          .addLayer("./images/_test1.jpg")
+          .exec(i -> i.crop(50, 50, 100, 100))
+          .setCanvasSize(100, 100)
+          .save("./out/cropped1.png");
+
+      // Patchwork grayscale on an image
+
+      new ICon("./images/_test1.jpg")
+          .setAsHeight(height)
+          .setAsWidth(width)
+          .addLayer("./images/_test1.jpg")
+          .exec(i -> i.crop(0, 0, 100, 100))
+          .exec(i -> i.toGrayscale())
+          .addLayer("./images/_test1.jpg")
+          .exec(i -> i.crop(100, 100, 50, 50))
+          .exec(i -> i.toGrayscale())
+          .moveLayer(100, 100)
+          .save("./out/cropped.png");
+    }
+
+    if (false) { // Histogram remapping
+      new ICon("./images/_test1.jpg")
+          .exec(i -> i.remap(c -> {
+            float[] hsv = Colors.rgb_to_hsv(c);
+            float value = hsv[2];
+
+            value = 255 - value;
+
+            float[] newRGB = Colors.hsvToRgb(hsv[0], hsv[1], value);
+
+            return new Color((int) newRGB[0], (int) newRGB[1], (int) newRGB[2]);
+          }))
+          .save("./out/invert.png");
+    }
 
     String grayscalePath = "./images/lung_infection.jpg";
+
     // ICon grayscale = new ICon(grayscalePath).exec(i -> i.toGrayscale());
 
     // ICon grayscaleHistogram = new ICon(grayscalePath)
-    //     .exec(i -> i.toGrayscale())
-    //     .appendHistogram().save("./out/grayscale.png");
+    // .exec(i -> i.toGrayscale())
+    // .appendHistogram().save("./out/grayscale.png");
 
     // grayscale
     // .exec(i -> i.remapValue(v -> 255 - v))
@@ -96,20 +147,20 @@ public class Main {
     // .save("./out/remapLog.png");
 
     // new ICon(grayscalePath)
-    //     .exec(i -> i.toGrayscale())
-    //     .exec(i -> i.remapValueFloat(v -> {
-    //       return (float) Math.pow(v, .5);
-    //     }))
-    //     .appendHistogram()
-    //     .save("./out/remapGammaRoot.png");
+    // .exec(i -> i.toGrayscale())
+    // .exec(i -> i.remapValueFloat(v -> {
+    // return (float) Math.pow(v, .5);
+    // }))
+    // .appendHistogram()
+    // .save("./out/remapGammaRoot.png");
 
     // new ICon(grayscalePath)
-    //     .exec(i -> i.toGrayscale())
-    //     .exec(i -> i.remapValueFloat(v -> {
-    //       return (float) Math.pow(v, 2);
-    //     }))
-    //     .appendHistogram()
-    //     .save("./out/remapGammaSquared.png");
+    // .exec(i -> i.toGrayscale())
+    // .exec(i -> i.remapValueFloat(v -> {
+    // return (float) Math.pow(v, 2);
+    // }))
+    // .appendHistogram()
+    // .save("./out/remapGammaSquared.png");
 
     new ICon(grayscalePath)
         .exec(i -> i.toGrayscale())
@@ -118,14 +169,15 @@ public class Main {
           float startY = .01f;
           float stopX = .9f;
           float stopY = .99f;
-          float startSlope = startY/startX;
-          float stopSlope = stopY/stopX;
-          float middleSlope = (stopY - startY)/(stopX - startX);
-          if(v < startX ) return v * startSlope;
-          if(v > stopX){
-            return (v-stopX)*stopSlope + stopX;
+          float startSlope = startY / startX;
+          float stopSlope = stopY / stopX;
+          float middleSlope = (stopY - startY) / (stopX - startX);
+          if (v < startX)
+            return v * startSlope;
+          if (v > stopX) {
+            return (v - stopX) * stopSlope + stopX;
           }
-          return (v-startX)*middleSlope+startX;
+          return (v - startX) * middleSlope + startX;
         }))
         .appendHistogram()
         .save("./out/remapPiecewise.png");

@@ -56,21 +56,19 @@ public class IP extends IPBase {
         return updatePixels(c -> lambda.toColor(c));
     }
 
-    public IP remapValueFloat(IFloatToFloat lambda){
-        
-        for(float i = 0; i < 1; i+=.1f){
-            System.out.println(i +" -> " + lambda.run(i));
-        }
-        
+    public IP remapValueFloat(IFloatToFloat lambda) {
+
         return updatePixels(c -> {
             float[] hsv = Colors.rgb_to_hsv(c);
             float value = hsv[2];
-            float valueFloat = value/255f;
+            float valueFloat = value / 255f;
 
             valueFloat = lambda.run(valueFloat);
-            value = (int)(valueFloat * 255f);
-            if(value < 0) value = 0;
-            if(value > 255) value = 255;
+            value = (int) (valueFloat * 255f);
+            if (value < 0)
+                value = 0;
+            if (value > 255)
+                value = 255;
 
             float[] newRGB = Colors.hsvToRgb(hsv[0], hsv[1], value);
 
@@ -83,9 +81,11 @@ public class IP extends IPBase {
             float[] hsv = Colors.rgb_to_hsv(c);
             float value = hsv[2];
 
-            value = lambda.run((int)value);
-            if(value < 0) value = 0;
-            if(value > 255) value = 255;
+            value = lambda.run((int) value);
+            if (value < 0)
+                value = 0;
+            if (value > 255)
+                value = 255;
 
             float[] newRGB = Colors.hsvToRgb(hsv[0], hsv[1], value);
 
@@ -388,20 +388,29 @@ public class IP extends IPBase {
 
         // Normalize
         float max = 0;
-        float secondMax = 0;
+        // float secondMax = 0;
         for (int i = 0; i < 256; i++) {
             if (histogram[i] > max) {
-                secondMax = max;
+                // secondMax = max;
                 max = histogram[i];
             }
         }
 
-        if(max > secondMax * 2 && secondMax != 0){
-            max = secondMax;
+        // if(max > secondMax * 2 && secondMax != 0){
+        // max = secondMax;
+        // }
+
+        // The sum of the histogram values is now 1
+        for (int i = 0; i < 256; i++) {
+            histogram[i] /= (bw * bh);
         }
 
+        float[] cdf = new float[256];
         for (int i = 0; i < 256; i++) {
-            histogram[i] /= max;
+            cdf[i] = histogram[i];
+            if (i != 0) {
+                cdf[i] += cdf[i - 1];
+            }
         }
 
         Graphics g = intermediate.getGraphics();
@@ -411,7 +420,13 @@ public class IP extends IPBase {
 
         for (int i = 0; i < 256; i++) {
             g.setColor(Color.BLACK);
-            g.fillRect(i, 0, 1, (int) ((1 - histogram[i]) * height));
+            g.fillRect(i, 0, 1, (int) ((1 - (histogram[i] * (bw * bh) / max)) * height));
+        }
+
+        // Now draw the cdf
+        for (int i = 0; i < 256 - 1; i++) {
+            g.setColor(Color.RED);
+            g.drawLine(i, height - (int) (cdf[i] * height), i + 1, height - (int) (cdf[i + 1] * height));
         }
 
         g.dispose();
@@ -763,9 +778,7 @@ public class IP extends IPBase {
 
         for (int y = 0; y < h; y++) {
             for (int x = 0; x < w; x++) {
-                Color color = new Color(bufferedImage.getRGB(x+startX, y+startY));
-
-                
+                Color color = new Color(bufferedImage.getRGB(x + startX, y + startY));
 
                 intermediate.setRGB(x, y, color.getRGB());
             }
@@ -773,6 +786,87 @@ public class IP extends IPBase {
 
         bufferedImage = intermediate;
         return this;
+    }
+
+    public float[] getHistogram() {
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+
+        float[] histogram = new float[256];
+        for (var i = 0; i < 256; i++) {
+            histogram[0] = 0;
+        }
+
+        for (var y = 0; y < bh; y++) {
+            for (var x = 0; x < bw; x++) {
+
+                Color original = new Color(bufferedImage.getRGB(x, y));
+
+                float[] hsv = Colors.rgb_to_hsv(original.getRed(), original.getGreen(), original.getBlue());
+
+                histogram[(int) hsv[2]]++;
+
+            }
+        }
+
+        // Normalize
+        for (int i = 0; i < 256; i++) {
+            histogram[i] /= (bw * bh);
+        }
+
+        return histogram;
+    }
+
+    public IP centerHistogram() {
+
+        // First we analyze the histogram
+        float[] histogram = getHistogram();
+
+        // Count up to 50 percent
+        int midIndex = 0;
+        float currentCount = 0;
+        for (int i = 0; i < histogram.length; i++) {
+            currentCount += histogram[i];
+            if (currentCount >= .5f) {
+                midIndex = i;
+                break;
+            }
+        }
+
+        int offset = 128 - midIndex;
+        System.out.println(midIndex);
+
+        return this.remapValueInt(i -> i + offset);
+    }
+
+    public IP histogramEqualization() {
+        var bw = bufferedImage.getWidth();
+        var bh = bufferedImage.getHeight();
+
+        float[] histogram = getHistogram();
+
+        float[] cdf = getCDF(histogram);
+        float[] remap = new float[256];
+
+        for (int i = 0; i < 256; i++) {
+            float h_v = (cdf[i]* 255);
+            remap[i] = h_v;
+        }
+
+        exec(i->i.remapValueInt(in->(int)(remap[in])));
+
+        return this;
+    }
+
+    private float[] getCDF(float[] histogram) {
+        float[] cdf = new float[256];
+        for (int i = 0; i < 256; i++) {
+            cdf[i] = histogram[i];
+            if (i > 0) {
+                cdf[i] += cdf[i - 1];
+            }
+        }
+        return cdf;
     }
 
 }
