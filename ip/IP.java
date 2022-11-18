@@ -11,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Hashtable;
+import java.util.List;
 import java.util.Map;
 
 import javax.imageio.ImageIO;
@@ -862,7 +863,7 @@ public class IP extends IPBase {
 
         return this.remapValueInt(i -> {
             int a = i - finalMidIndex;
-            a *= 128f/(float)scale;
+            a *= 128f / (float) scale;
             return (int) (a + offsetMid + finalMidIndex);
         });
     }
@@ -895,6 +896,121 @@ public class IP extends IPBase {
             }
         }
         return cdf;
+    }
+
+    public float[][] toIntegralImage() {
+        int bw = bufferedImage.getWidth();
+        int bh = bufferedImage.getHeight();
+        float[][] toReturn = new float[bw][bh];
+
+        Color original = new Color(bufferedImage.getRGB(0, 0));
+        float[] hsv = Colors.rgb_to_hsv(original.getRed(), original.getGreen(), original.getBlue());
+
+        toReturn[0][0] = hsv[2];
+        for (int y = 0; y < bh; y++) {
+            for (int x = 0; x < bw; x++) {
+                if (!(x == 0 && y == 0)) {
+                    original = new Color(bufferedImage.getRGB(0, 0));
+                    hsv = Colors.rgb_to_hsv(original.getRed(), original.getGreen(), original.getBlue());
+
+                    float a = hsv[2];
+                    float b = isValidCoordinate(x, y - 1) ? toReturn[x][y - 1] : 0;
+                    float c = isValidCoordinate(x - 1, y) ? toReturn[x - 1][y] : 0;
+                    float d = isValidCoordinate(x - 1, y - 1) ? toReturn[x - 1][y - 1] : 0;
+                    float result = a + b + c - d;
+                    toReturn[x][y] = result;
+                }
+            }
+        }
+
+        return toReturn;
+    }
+
+    class fp{
+        public int num = 1;
+        public int i = 0;
+        public int j = 0;
+        public int w = 0;
+        public int h = 0;
+        public int value = 0;
+
+        public fp(int num, int i, int j, int w, int h, int value){
+            this.num = num;
+            this.i = i;
+            this.j = j;
+            this.w = w;
+            this.h = h;
+            this.value = value;
+        }
+    }
+
+    public IPBase faceDetect() {
+        int bw = bufferedImage.getWidth();
+        int bh = bufferedImage.getHeight();
+        BufferedImage intermediate = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB);
+
+        List<fp> features = new ArrayList<>();
+        
+
+
+
+        for (int y = 0; y < bh; y++) {//y = i
+            for (int x = 0; x < bw; x++) {// x = j
+                for(int h = 0; h  + y  <bh; h++){
+                    for(int w = 0; x+2*w < bw; w++){
+                        int s1 = 0;
+                        for(int i1 = y; i1 <=y+h-1; i1++){
+                            for(int j1 = x; j1 <= x+w-1; j1++){
+                                Color c = new Color(bufferedImage.getRGB(i1,j1));
+                                int r = c.getRed();
+                                int g = c.getGreen();
+                                int b = c.getBlue();
+                                int gray = (r + g + b)/3;
+                                s1+= gray;
+                            }
+                        }
+                        int s2 = 0;
+                        for(int i1 = y; i1 <=y+h-1; i1++){
+                            for(int j1 = x+w; j1 <= x+2*w-1; j1++){
+                                Color c = new Color(bufferedImage.getRGB(i1,j1));
+                                int r = c.getRed();
+                                int g = c.getGreen();
+                                int b = c.getBlue();
+                                int gray = (r + g + b)/3;
+                                s2+= gray;
+                            }
+                        }
+                        int s = s1 - s2;
+                        fp temp = new fp(1, x,y,w,h, s);
+                        features.add(temp);
+                    }
+
+                }
+            }
+        }
+
+        float[][] ii = this.toIntegralImage();
+
+        for (int y = 0; y < bh; y++) {
+            for (int x = 0; x < bw; x++) {
+                int gray = 0;
+                if (isValidCoordinate(x - 1, y - 1) && isValidCoordinate(x + 1, y + 1)) {
+                    int a = (int) ii[x - 1][y - 1];
+                    int b = (int) ii[x + 1][y - 1];
+                    int c = (int) ii[x - 1][y + 1];
+                    int d = (int) ii[x + 1][y + 1];
+
+                    int v = a + d - b - c;
+                    gray = v;
+
+                }
+
+                intermediate.setRGB(x, y, new Color(gray, gray, gray).getRGB());
+            }
+        }
+
+        bufferedImage = intermediate;
+        return this;
     }
 
 }

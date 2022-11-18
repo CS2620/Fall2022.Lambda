@@ -35,7 +35,16 @@ public class Main {
     // Actual image
     // processing-----------------------------------------------------------------------------------------------------
 
-    if (true) { // Recenter as if it were a distribution
+    if(true){//Haar transform
+
+      new IP("./images/face.png")
+      .faceDetect()
+      .save("./out/face.png");
+      // float[][] ii = new IP("./images/face.png").toIntegralImage();
+
+    }
+
+    if (false) { // Recenter as if it were a distribution
       //Try to auto-adjust the image based on the histogram
 
       new ICon("./images/_test1_under.png")
@@ -169,25 +178,25 @@ public class Main {
     // .appendHistogram()
     // .save("./out/remapGammaSquared.png");
 
-    new ICon(grayscalePath)
-        .exec(i -> i.toGrayscale())
-        .exec(i -> i.remapValueFloat(v -> {
-          float startX = .3f;
-          float startY = .01f;
-          float stopX = .9f;
-          float stopY = .99f;
-          float startSlope = startY / startX;
-          float stopSlope = stopY / stopX;
-          float middleSlope = (stopY - startY) / (stopX - startX);
-          if (v < startX)
-            return v * startSlope;
-          if (v > stopX) {
-            return (v - stopX) * stopSlope + stopX;
-          }
-          return (v - startX) * middleSlope + startX;
-        }))
-        .appendHistogram()
-        .save("./out/remapPiecewise.png");
+    // new ICon(grayscalePath)
+    //     .exec(i -> i.toGrayscale())
+    //     .exec(i -> i.remapValueFloat(v -> {
+    //       float startX = .3f;
+    //       float startY = .01f;
+    //       float stopX = .9f;
+    //       float stopY = .99f;
+    //       float startSlope = startY / startX;
+    //       float stopSlope = stopY / stopX;
+    //       float middleSlope = (stopY - startY) / (stopX - startX);
+    //       if (v < startX)
+    //         return v * startSlope;
+    //       if (v > stopX) {
+    //         return (v - stopX) * stopSlope + stopX;
+    //       }
+    //       return (v - startX) * middleSlope + startX;
+    //     }))
+    //     .appendHistogram()
+    //     .save("./out/remapPiecewise.png");
 
     /*
      * new ICon("./images/" + filename + ".jpg")
@@ -305,7 +314,7 @@ public class Main {
     }
 
     // Generate bit-sliced image at each distinct bit
-    if (true) {
+    if (false) {
       for (int inc = 0; inc < 8; inc++) {
         int a = inc;
         new ICon("./images/_test1.jpg")
