@@ -35,7 +35,84 @@ public class Main {
     // Actual image
     // processing-----------------------------------------------------------------------------------------------------
 
-    if(true){//Haar transform
+    if(true){//Kernels
+      float[][] identityKernel = new float[3][3];
+      identityKernel[0] = new float[]{0,0,0};
+      identityKernel[1] = new float[]{0,1,0};
+      identityKernel[2] = new float[]{0,0,0};
+      Kernel kernel = new Kernel(identityKernel);
+
+      new ICon("./images/DebugTiny.png")
+      .exec(i->i.toGrayscale())
+      .exec(i->i.applyKernel(kernel))
+      .save("./out/DebugTiny_identity_kernel.png");
+
+
+      //Trival Box Blur
+      float[][] boxKernelFloats = new float[3][3];
+      boxKernelFloats[0] = new float[]{1,1,1};
+      boxKernelFloats[1] = new float[]{1,1,1};
+      boxKernelFloats[2] = new float[]{1,1,1};
+      Kernel boxKernel = new Kernel(boxKernelFloats).normalize();
+
+      new ICon("./images/DebugTiny.png")
+      .exec(i->i.toGrayscale())
+      .exec(i->i.applyKernel(boxKernel))
+      .save("./out/DebugTiny_box_kernel.png");
+
+      //Larger Box Blur
+      new ICon("./images/_test1.jpg")
+      .exec(i->i.toGrayscale())
+      .exec(i->i.applyKernel(boxKernel))
+      .save("./out/test1_box_kernel.png");
+
+      // Edge Detection
+      float[][] edgeKernelVFloats = new float[3][1];
+      edgeKernelVFloats[0] = new float[]{1};
+      edgeKernelVFloats[1] = new float[]{0};
+      edgeKernelVFloats[2] = new float[]{-1};
+      Kernel edgeKernelV = new Kernel(edgeKernelVFloats);
+      new ICon("./images/_test1.jpg")
+      .exec(i->i.toGrayscale())
+      .exec(i->i.applyKernel(edgeKernelV))
+      .save("./out/_test1_edge_kernelV.png");
+
+      //Edge Detection the other way
+      float[][] edgeKernelHFloats = new float[1][3];
+      edgeKernelHFloats[0] = new float[]{1,0,-1};
+      Kernel edgeKernelH = new Kernel(edgeKernelHFloats);
+      new ICon("./images/_test1.jpg")
+      .exec(i->i.toGrayscale())
+      .exec(i->i.applyKernel(edgeKernelH))
+      .save("./out/_test1_edge_kernelH.png");
+
+      //Sharpening
+      float tune = 2f;
+      float[][] sharpenKernelFloats = new float[3][3];
+      sharpenKernelFloats[0] = new float[]{0,-1f/5f*tune,0};
+      sharpenKernelFloats[1] = new float[]{-1f/5f*tune,1+tune-1f/5f*tune,-1f/5f*tune};
+      sharpenKernelFloats[2] = new float[]{0,-1f/5f*tune,0};
+      Kernel shapenKernel = new Kernel(sharpenKernelFloats);
+
+      new ICon("./images/_test1.jpg")
+      .exec(i->i.toGrayscale())
+      .exec(i->i.applyKernel(shapenKernel))
+      .save("./out/_test1_shapen_kernel.png");
+
+      new ICon("./images/_test1.jpg")
+      .exec(i->i.toGrayscale())
+      .save("./out/_test1_bw.png");
+
+      
+
+
+
+
+
+    }
+
+
+    if(false){//Haar transform
 
       new IP("./images/face.png")
       .faceDetect()

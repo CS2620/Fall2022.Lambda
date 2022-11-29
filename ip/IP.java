@@ -926,7 +926,7 @@ public class IP extends IPBase {
         return toReturn;
     }
 
-    class fp{
+    class fp {
         public int num = 1;
         public int i = 0;
         public int j = 0;
@@ -934,7 +934,7 @@ public class IP extends IPBase {
         public int h = 0;
         public int value = 0;
 
-        public fp(int num, int i, int j, int w, int h, int value){
+        public fp(int num, int i, int j, int w, int h, int value) {
             this.num = num;
             this.i = i;
             this.j = j;
@@ -950,38 +950,35 @@ public class IP extends IPBase {
         BufferedImage intermediate = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB);
 
         List<fp> features = new ArrayList<>();
-        
 
-
-
-        for (int y = 0; y < bh; y++) {//y = i
+        for (int y = 0; y < bh; y++) {// y = i
             for (int x = 0; x < bw; x++) {// x = j
-                for(int h = 0; h  + y  <bh; h++){
-                    for(int w = 0; x+2*w < bw; w++){
+                for (int h = 0; h + y < bh; h++) {
+                    for (int w = 0; x + 2 * w < bw; w++) {
                         int s1 = 0;
-                        for(int i1 = y; i1 <=y+h-1; i1++){
-                            for(int j1 = x; j1 <= x+w-1; j1++){
-                                Color c = new Color(bufferedImage.getRGB(i1,j1));
+                        for (int i1 = y; i1 <= y + h - 1; i1++) {
+                            for (int j1 = x; j1 <= x + w - 1; j1++) {
+                                Color c = new Color(bufferedImage.getRGB(i1, j1));
                                 int r = c.getRed();
                                 int g = c.getGreen();
                                 int b = c.getBlue();
-                                int gray = (r + g + b)/3;
-                                s1+= gray;
+                                int gray = (r + g + b) / 3;
+                                s1 += gray;
                             }
                         }
                         int s2 = 0;
-                        for(int i1 = y; i1 <=y+h-1; i1++){
-                            for(int j1 = x+w; j1 <= x+2*w-1; j1++){
-                                Color c = new Color(bufferedImage.getRGB(i1,j1));
+                        for (int i1 = y; i1 <= y + h - 1; i1++) {
+                            for (int j1 = x + w; j1 <= x + 2 * w - 1; j1++) {
+                                Color c = new Color(bufferedImage.getRGB(i1, j1));
                                 int r = c.getRed();
                                 int g = c.getGreen();
                                 int b = c.getBlue();
-                                int gray = (r + g + b)/3;
-                                s2+= gray;
+                                int gray = (r + g + b) / 3;
+                                s2 += gray;
                             }
                         }
                         int s = s1 - s2;
-                        fp temp = new fp(1, x,y,w,h, s);
+                        fp temp = new fp(1, x, y, w, h, s);
                         features.add(temp);
                     }
 
@@ -1010,6 +1007,42 @@ public class IP extends IPBase {
         }
 
         bufferedImage = intermediate;
+        return this;
+    }
+
+    public IP applyKernel(Kernel kernel) {
+
+        int bw = bufferedImage.getWidth();
+        int bh = bufferedImage.getHeight();
+        BufferedImage intermediate = new BufferedImage(bw, bh, BufferedImage.TYPE_INT_ARGB);
+
+        int halfSizeX = (kernel.sizeX - 1) / 2;
+        int halfSizeY = (kernel.sizeY - 1) / 2;
+
+        for (int y = 0; y < bh; y++) {
+            for (int x = 0; x < bw; x++) {
+                float sum = 0;
+                for (int ky = -halfSizeY; ky <= halfSizeY; ky++) {
+                    for (int kx = -halfSizeX; kx <= halfSizeX; kx++) {
+                        int ix = Math.min(Math.max(x + kx, 0), bw - 1);
+                        int iy = Math.min(Math.max(y + ky, 0), bh - 1);
+                        Color c = new Color(bufferedImage.getRGB(ix,iy));
+                        int value = c.getRed();
+                        float product = value * kernel.get(kx, ky);
+                        sum += product;
+                    }
+                }
+
+                int gray = (int) sum;
+                if(gray < 0) gray *= -1;
+                gray = Math.max(Math.min(255, gray), 0);
+
+                intermediate.setRGB(x, y, new Color(gray, gray, gray).getRGB());
+            }
+        }
+
+        bufferedImage = intermediate;
+
         return this;
     }
 
