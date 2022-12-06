@@ -35,7 +35,7 @@ public class Main {
     // Actual image
     // processing-----------------------------------------------------------------------------------------------------
 
-    if(true){//Kernels
+    if(false){//Kernels
       float[][] identityKernel = new float[3][3];
       identityKernel[0] = new float[]{0,0,0};
       identityKernel[1] = new float[]{0,1,0};
@@ -114,11 +114,36 @@ public class Main {
 
     if(false){//Haar transform
 
-      new IP("./images/face.png")
+      new IP("./images/DebugTinyBW.png")
       .faceDetect()
-      .save("./out/face.png");
+      .save("./out/DebugTinyIntegralImage.png");
       // float[][] ii = new IP("./images/face.png").toIntegralImage();
 
+    }
+    if(false){
+      //OCR Generation
+      new IP("./images/alphabet.png")
+      .cropORC();
+    }
+    if(true){
+      //OCR
+      new IP("./images/Z.png")
+      .recognizeORC();
+    }
+    if(true){
+      //OCR
+      new IP("./images/A2.png")
+      .recognizeORC();
+    }
+    if(true){
+      //OCR
+      new IP("./images/A3.png")
+      .recognizeORC();
+    }
+    if(true){
+      //OCR
+      new IP("./images/A4.png")
+      .recognizeORC();
     }
 
     if (false) { // Recenter as if it were a distribution

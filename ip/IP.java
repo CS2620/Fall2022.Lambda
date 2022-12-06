@@ -910,7 +910,7 @@ public class IP extends IPBase {
         for (int y = 0; y < bh; y++) {
             for (int x = 0; x < bw; x++) {
                 if (!(x == 0 && y == 0)) {
-                    original = new Color(bufferedImage.getRGB(0, 0));
+                    original = new Color(bufferedImage.getRGB(x, y));
                     hsv = Colors.rgb_to_hsv(original.getRed(), original.getGreen(), original.getBlue());
 
                     float a = hsv[2];
@@ -1026,7 +1026,7 @@ public class IP extends IPBase {
                     for (int kx = -halfSizeX; kx <= halfSizeX; kx++) {
                         int ix = Math.min(Math.max(x + kx, 0), bw - 1);
                         int iy = Math.min(Math.max(y + ky, 0), bh - 1);
-                        Color c = new Color(bufferedImage.getRGB(ix,iy));
+                        Color c = new Color(bufferedImage.getRGB(ix, iy));
                         int value = c.getRed();
                         float product = value * kernel.get(kx, ky);
                         sum += product;
@@ -1034,7 +1034,8 @@ public class IP extends IPBase {
                 }
 
                 int gray = (int) sum;
-                if(gray < 0) gray *= -1;
+                if (gray < 0)
+                    gray *= -1;
                 gray = Math.max(Math.min(255, gray), 0);
 
                 intermediate.setRGB(x, y, new Color(gray, gray, gray).getRGB());
@@ -1044,6 +1045,74 @@ public class IP extends IPBase {
         bufferedImage = intermediate;
 
         return this;
+    }
+
+    public void cropORC() {
+
+        int bw = bufferedImage.getWidth();
+        int bh = bufferedImage.getHeight();
+        int width = bw / 26;
+        System.out.println(width);
+        System.out.println(bh);
+
+        for (int i = 0; i < 26; i++) {
+            new IP(this).crop(width * i + 7, 0, width, bh).save("./OCR/" + (char) (i + 65) + ".png");
+        }
+    }
+
+    public float getPercentWhite() {
+        int bw = bufferedImage.getWidth();
+        int bh = bufferedImage.getHeight();
+
+        int total = bw*bh;
+        int sum = 0;
+
+        for (int y = 0; y < bh; y++) {
+            for (int x = 0; x < bw; x++) {
+
+                Color c = new Color(bufferedImage.getRGB(x, y));
+                int red = c.getRed();
+                if(red == 255){
+                    sum += 1;
+                }
+            }
+        }
+
+        return sum/(float)total;
+    }
+
+    public void recognizeORC() {
+
+        OCRFeatures[] features = new OCRFeatures[26];
+
+        //Get the features from the images
+        for (int i = 0; i < 26; i++) {
+            String filename = "./OCR/" + (char) (i + 65) + ".png";
+            IP temp = new IP(filename);
+            OCRFeatures ocr = new OCRFeatures();
+            ocr.percentWhite = temp.getPercentWhite();
+            ocr.file = filename;
+            features[i] = ocr;
+        }
+
+        //Get the feature for this image
+        OCRFeatures myOCR = new OCRFeatures();
+        myOCR.percentWhite = this.getPercentWhite();
+
+        float minDistance = Float.MAX_VALUE;
+        int minIndex = -1;
+        for(int i = 0; i < 26; i++){
+            OCRFeatures temp = features[i];
+            float distance = temp.distanceTo(myOCR);
+            if(distance < minDistance){
+                minDistance = distance;
+                minIndex = i;
+            }
+        }
+
+        System.out.println("The closest letter is index " + minIndex + " " + features[minIndex].file);
+
+
     }
 
 }
