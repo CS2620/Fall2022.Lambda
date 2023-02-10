@@ -35,6 +35,18 @@ public class Main {
     // Actual image
     // processing-----------------------------------------------------------------------------------------------------
 
+    //Grayscale and dither
+    if(true){
+      new ICon("./images/bull.jpg")
+      .exec(i->i.toGrayscale())
+      .exec(l -> {
+            l.updateToPaletteDithered(new Color[] { Color.BLACK, Color.WHITE });
+            return null;
+          })
+          .save("./out/dithered_bw.png");
+    }
+
+
     if(false){//Kernels
       float[][] identityKernel = new float[3][3];
       identityKernel[0] = new float[]{0,0,0};
@@ -125,22 +137,22 @@ public class Main {
       new IP("./images/alphabet.png")
       .cropORC();
     }
-    if(true){
+    if(false){
       //OCR
       new IP("./images/Z.png")
       .recognizeORC();
     }
-    if(true){
+    if(false){
       //OCR
       new IP("./images/A2.png")
       .recognizeORC();
     }
-    if(true){
+    if(false){
       //OCR
       new IP("./images/A3.png")
       .recognizeORC();
     }
-    if(true){
+    if(false){
       //OCR
       new IP("./images/A4.png")
       .recognizeORC();
